@@ -52,41 +52,49 @@ export default function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-pmu-gray flex items-center justify-center p-4">
+    <div className="min-h-screen bg-pmu-gray flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
+        {/* Logo and Welcome Section */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <img
-              src="/pmu-official-logo.png"
-              alt="PMU Official Logo"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
+          <div className="flex justify-center mb-6">
+            <div className="h-20 w-20 flex items-center justify-center">
+              <img
+                src="/pmu-exact-logo.png"
+                alt="PMU Official Logo"
+                width={80}
+                height={80}
+                className="object-contain h-full w-full"
+              />
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-pmu-blue">Welcome Back</h1>
-          <p className="text-gray-600 mt-2">Sign in to your PMU Student Account</p>
+          <h1 className="text-2xl font-semibold text-pmu-blue mb-2">Welcome Back</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Sign in to your <span className="text-pmu-blue font-semibold">PMU</span> Student Account
+          </p>
         </div>
 
-        <Card className="shadow-lg border-0">
-          <CardHeader className="bg-pmu-blue text-pmu-white rounded-t-lg">
-            <CardTitle className="text-center text-pmu-white">Sign In</CardTitle>
-            <CardDescription className="text-center text-pmu-gold">
-              Enter your PMU credentials to continue
+        {/* Login Card */}
+        <Card className="shadow-lg border border-border bg-card">
+          <CardHeader className="space-y-1 pb-6">
+            <CardTitle className="text-xl font-semibold text-center">Sign In</CardTitle>
+            <CardDescription className="text-center text-muted-foreground">
+              Enter your credentials to continue
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+          <CardContent className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
-                <Alert variant="destructive">
+                <Alert variant="destructive" className="mb-4">
                   <AlertDescription>{error}</AlertDescription>
                 </Alert>
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-pmu-blue font-medium">Email</Label>
+                <Label htmlFor="email" className="text-sm font-medium text-foreground">
+                  Email Address
+                </Label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     name="email"
@@ -94,16 +102,19 @@ export default function LoginContent() {
                     required
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="pl-10 border-pmu-blue focus:ring-pmu-blue focus:border-pmu-blue"
+                    className="pl-10 h-11 border-border focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                     placeholder="student@pmu.edu.sa"
+                    aria-label="Email address"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-pmu-blue font-medium">Password</Label>
+                <Label htmlFor="password" className="text-sm font-medium text-foreground">
+                  Password
+                </Label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     name="password"
@@ -111,16 +122,18 @@ export default function LoginContent() {
                     required
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="pl-10 border-pmu-blue focus:ring-pmu-blue focus:border-pmu-blue"
+                    className="pl-10 h-11 border-border focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                     placeholder="Enter your password"
+                    aria-label="Password"
                   />
                 </div>
               </div>
 
               <Button
                 type="submit"
-                className="w-full bg-pmu-gold text-pmu-white hover:bg-pmu-gold-dark font-medium"
+                className="w-full h-11 bg-pmu-gold text-pmu-white hover:bg-pmu-gold-dark font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoading}
+                aria-label="Sign in"
               >
                 {isLoading ? (
                   <>
@@ -133,12 +146,13 @@ export default function LoginContent() {
               </Button>
             </form>
 
-            <div className="mt-6 text-center">
-              <p className="text-sm text-gray-600">
+            {/* Registration Link */}
+            <div className="pt-4 border-t border-border">
+              <p className="text-sm text-center text-muted-foreground">
                 Don't have an account?{' '}
                 <Link 
                   href="/register" 
-                  className="font-medium text-pmu-gold hover:text-pmu-gold-dark"
+                  className="font-medium text-pmu-gold hover:text-pmu-gold-dark transition-colors underline-offset-4 hover:underline"
                 >
                   Create one
                 </Link>

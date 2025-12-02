@@ -9,9 +9,12 @@ import {
   Receipt,
   CheckCircle,
   AlertCircle,
+  Info,
 } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { ServiceCard } from "@/components/ui/service-card"
+import { StatCard } from "@/components/ui/stat-card"
 
 const services = [
   {
@@ -68,101 +71,87 @@ const alerts = [
   {
     type: "warning",
     message: "Registration for Spring 2025 opens on December 15th",
+    icon: AlertCircle,
   },
   {
     type: "info",
     message: "Final exam schedule is now available",
+    icon: Info,
   },
 ]
 
 export function DashboardContent() {
   return (
-    <div className="p-4 lg:p-8 max-w-7xl mx-auto">
-      {/* Page Title */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Student Services</h1>
-        <p className="text-muted-foreground">Welcome back! Access your academic services below.</p>
-      </div>
-
-      {/* Alerts */}
-      {alerts.length > 0 && (
-        <div className="mb-6 space-y-3">
-          {alerts.map((alert, index) => (
-            <div
-              key={index}
-              className={`flex items-start gap-3 p-4 rounded-lg border ${
-                alert.type === "warning"
-                  ? "bg-pmu-gold/10 border-pmu-gold/30 text-pmu-gold-dark"
-                  : "bg-pmu-blue/10 border-pmu-blue/30 text-pmu-blue"
-              }`}
-            >
-              {alert.type === "warning" ? (
-                <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
-              ) : (
-                <CheckCircle className="h-5 w-5 shrink-0 mt-0.5" />
-              )}
-              <p className="text-sm font-medium">{alert.message}</p>
-            </div>
-          ))}
+    <div className="min-h-screen bg-pmu-gray">
+      <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+        {/* Page Title */}
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-foreground mb-2">Student Services</h1>
+          <p className="text-muted-foreground text-sm sm:text-base">
+            Welcome back! Access your academic services below.
+          </p>
         </div>
-      )}
 
-      {/* Services Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {services.map((service) => {
-          const Icon = service.icon
-          return (
-            <Card key={service.title} className="hover:shadow-lg transition-shadow cursor-pointer group">
-              <CardHeader className="pb-3">
-                <div className="flex items-start justify-between">
-                  <div className={`p-2.5 rounded-lg bg-secondary ${service.color}`}>
-                    <Icon className="h-5 w-5" />
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <CardTitle className="text-base mb-2 group-hover:text-primary transition-colors">
-                  {service.title}
-                </CardTitle>
-                <p className="text-sm text-muted-foreground leading-relaxed">{service.description}</p>
-                <Button variant="link" className="px-0 mt-2 h-auto text-sm font-medium">
-                  Access →
-                </Button>
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
+        {/* Alerts */}
+        {alerts.length > 0 && (
+          <div className="mb-8 space-y-3">
+            {alerts.map((alert, index) => {
+              const Icon = alert.icon
+              return (
+                <Alert
+                  key={index}
+                  className={
+                    alert.type === "warning"
+                      ? "bg-pmu-gold/10 border-pmu-gold/30 text-pmu-gold-dark"
+                      : "bg-pmu-blue/10 border-pmu-blue/30 text-pmu-blue"
+                  }
+                >
+                  <Icon className="h-4 w-4" />
+                  <AlertDescription className="font-medium">{alert.message}</AlertDescription>
+                </Alert>
+              )
+            })}
+          </div>
+        )}
 
-      {/* Quick Stats */}
-      <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Current GPA</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">3.75</div>
-            <p className="text-xs text-muted-foreground mt-1">Out of 4.00</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Completed Credits</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">87</div>
-            <p className="text-xs text-muted-foreground mt-1">Out of 120 required</p>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Account Balance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-foreground">$0.00</div>
-            <p className="text-xs text-pmu-gold mt-1 font-medium">Account is clear</p>
-          </CardContent>
-        </Card>
+        {/* Services Grid */}
+        <div className="mb-10">
+          <h2 className="text-lg font-semibold text-foreground mb-4">Available Services</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {services.map((service) => (
+              <ServiceCard
+                key={service.title}
+                icon={service.icon}
+                title={service.title}
+                description={service.description}
+                color={service.color}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div>
+          <h2 className="text-lg font-semibold text-foreground mb-4">Quick Stats</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <StatCard
+              title="Current GPA"
+              value="3.75"
+              subtitle="Out of 4.00"
+            />
+            <StatCard
+              title="Completed Credits"
+              value="87"
+              subtitle="Out of 120 required"
+            />
+            <StatCard
+              title="Account Balance"
+              value="$0.00"
+              subtitle="Account is clear"
+              className="sm:col-span-2 lg:col-span-1"
+            />
+          </div>
+        </div>
       </div>
     </div>
   )

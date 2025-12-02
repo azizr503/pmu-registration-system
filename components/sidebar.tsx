@@ -25,6 +25,8 @@ import { Button } from "@/components/ui/button"
 interface SidebarProps {
   isOpen: boolean
   isCollapsed: boolean
+  currentPage?: string
+  onNavigate?: (page: string) => void
 }
 
 interface MenuItem {
@@ -86,10 +88,11 @@ export function Sidebar({ isOpen, isCollapsed }: SidebarProps) {
       <aside
         className={cn(
           "fixed lg:static inset-y-0 left-0 z-40 bg-sidebar border-r border-sidebar-border transition-all duration-300 ease-in-out",
-          "flex flex-col",
+          "flex flex-col shadow-sm",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
           isCollapsed ? "lg:w-16" : "w-64",
         )}
+        aria-label="Main navigation"
       >
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
@@ -102,16 +105,24 @@ export function Sidebar({ isOpen, isCollapsed }: SidebarProps) {
                 <Button
                   variant="ghost"
                   className={cn(
-                    "w-full gap-3 px-3 py-2.5 h-auto text-sm font-medium transition-all",
+                    "w-full gap-3 px-3 py-2.5 h-auto text-sm font-medium transition-all relative",
                     isCollapsed ? "justify-center" : "justify-start",
                     isActive
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                      ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
                       : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
                   )}
                   onClick={() => handleItemClick(item)}
                   title={isCollapsed ? item.label : undefined}
+                  aria-label={item.label}
+                  aria-current={isActive ? "page" : undefined}
                 >
-                  <Icon className="h-4 w-4 shrink-0" />
+                  {isActive && !isCollapsed && (
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-pmu-blue rounded-r-full" />
+                  )}
+                  <Icon className={cn(
+                    "h-4 w-4 shrink-0",
+                    isActive && "text-pmu-blue"
+                  )} />
                   {!isCollapsed && (
                     <>
                       <span className="flex-1 text-left">{item.label}</span>

@@ -6,7 +6,18 @@
     "firstName": "aziz",
     "lastName": "sale",
     "studentId": "20256341",
-    "createdAt": "2025-10-14T21:31:51.224Z"
+    "createdAt": "2025-10-14T21:31:51.224Z",
+    "phone": "+966 50 123 4567",
+    "address": "Al Khobar, Eastern Province",
+    "major": "Software Engineering",
+    "minor": "Data Science",
+    "enrollmentDate": "Fall 2023",
+    "expectedGraduation": "Spring 2027",
+    "gpa": 3.75,
+    "completedCredits": 45,
+    "requiredCredits": 120,
+    "academicStanding": "Good Standing",
+    "completedCourses": ["CS101", "CS102", "MATH101", "ENG101"]
   },
   {
     "id": "239aac24-e9a3-4a83-86ac-ef9ff0b653d7",

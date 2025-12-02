@@ -12,6 +12,18 @@ export interface User {
   lastName: string
   studentId: string
   createdAt: string
+  // Optional academic profile fields
+  phone?: string
+  address?: string
+  major?: string
+  minor?: string
+  enrollmentDate?: string
+  expectedGraduation?: string
+  gpa?: number
+  completedCredits?: number
+  requiredCredits?: number
+  academicStanding?: string
+  completedCourses?: string[]
 }
 
 export interface AuthUser {
@@ -23,6 +35,7 @@ export interface AuthUser {
 }
 
 // In-memory storage for development/demo (resets on server restart)
+// Note: Profile API reads from JSON file, but login uses in-memory storage
 let usersStorage: User[] = [
   // Add your existing user data here if you want to preserve it
   {
@@ -36,11 +49,42 @@ let usersStorage: User[] = [
   }
 ]
 
+// Read users from JSON file (for API routes)
+export async function getUsersFromFile(): Promise<User[]> {
+  try {
+    const fs = await import('fs/promises')
+    const path = await import('path')
+    const filePath = path.join(process.cwd(), 'data', 'users.json')
+    const fileContent = await fs.readFile(filePath, 'utf-8')
+    return JSON.parse(fileContent) as User[]
+  } catch (error) {
+    console.error('Error reading users file:', error)
+    // Fallback to in-memory storage
+    return usersStorage
+  }
+}
+
 // Read users from storage
 export async function getUsers(): Promise<User[]> {
   // For production, you can integrate with a database
   // For now, using in-memory storage that works on Vercel
   return usersStorage
+}
+
+// Get user by ID or email
+export async function getUserById(id: string): Promise<User | null> {
+  const users = await getUsersFromFile()
+  return users.find(u => u.id === id) || null
+}
+
+export async function getUserByEmail(email: string): Promise<User | null> {
+  const users = await getUsersFromFile()
+  return users.find(u => u.email.toLowerCase() === email.toLowerCase()) || null
+}
+
+export async function getUserByStudentId(studentId: string): Promise<User | null> {
+  const users = await getUsersFromFile()
+  return users.find(u => u.studentId === studentId) || null
 }
 
 // Write users to storage

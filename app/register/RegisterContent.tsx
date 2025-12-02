@@ -92,7 +92,7 @@ export default function RegisterContent() {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
             <img
-              src="/pmu-official-logo.png"
+              src="/pmu-exact-logo.png"
               alt="PMU Official Logo"
               width={80}
               height={80}
@@ -100,14 +100,16 @@ export default function RegisterContent() {
             />
           </div>
           <h1 className="text-2xl font-bold text-pmu-blue">Student Registration</h1>
-          <p className="text-gray-600 mt-2">Join PMU Student Registration System</p>
+          <p className="text-gray-600 mt-2">
+            Join <span className="text-pmu-blue font-semibold">PMU</span> Student Registration System
+          </p>
         </div>
 
         <Card className="shadow-lg border-0">
           <CardHeader className="bg-pmu-blue text-pmu-white rounded-t-lg">
             <CardTitle className="text-center text-pmu-white">Create Account</CardTitle>
             <CardDescription className="text-center text-pmu-gold">
-              Register with your PMU email address
+              Register with your <span className="text-pmu-blue">PMU</span> email address
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -168,7 +170,9 @@ export default function RegisterContent() {
                     placeholder="student@pmu.edu.sa"
                   />
                 </div>
-                <p className="text-xs text-pmu-gold font-medium">Must be a valid PMU email address</p>
+                <p className="text-xs text-pmu-gold font-medium">
+                  Must be a valid <span className="text-pmu-blue">PMU</span> email address
+                </p>
               </div>
 
               <div className="space-y-2">

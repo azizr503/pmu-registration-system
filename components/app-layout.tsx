@@ -16,7 +16,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-pmu-gray">
       <Header
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -24,7 +24,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isOpen={sidebarOpen} isCollapsed={sidebarCollapsed} />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+        <main className="flex-1 overflow-y-auto bg-pmu-gray">{children}</main>
       </div>
       <AIChatbot />
     </div>

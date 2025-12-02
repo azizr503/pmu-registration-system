@@ -3,37 +3,64 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/* Updated color scheme to match PMU's official academic style with deep blue header */
+/* PMU Official Colors */
 :root {
-  --background: oklch(0.96 0.002 264);
+  --pmu-blue: #00205B;
+  --pmu-gold: #C69214;
+  --pmu-gray: #F4F4F4;
+  --pmu-white: #FFFFFF;
+  --pmu-gold-dark: #B07E10;
+  
+  /* Design System - Spacing */
+  --spacing-xs: 0.25rem;    /* 4px */
+  --spacing-sm: 0.5rem;     /* 8px */
+  --spacing-md: 1rem;       /* 16px */
+  --spacing-lg: 1.5rem;     /* 24px */
+  --spacing-xl: 2rem;       /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  
+  /* Design System - Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  
+  /* Design System - Border Radius */
+  --radius-sm: 0.375rem;    /* 6px */
+  --radius-md: 0.5rem;      /* 8px */
+  --radius-lg: 0.75rem;     /* 12px */
+  --radius-xl: 1rem;        /* 16px */
+  
+  /* Updated color scheme to match PMU's official academic style */
+  --background: var(--pmu-gray);
   --foreground: oklch(0.2 0.01 264);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.2 0.01 264);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.2 0.01 264);
-  --primary: oklch(0.35 0.12 264);
-  --primary-foreground: oklch(0.99 0 0);
+  --primary: var(--pmu-blue);
+  --primary-foreground: var(--pmu-white);
   --secondary: oklch(0.94 0.005 264);
   --secondary-foreground: oklch(0.2 0.01 264);
   --muted: oklch(0.94 0.005 264);
   --muted-foreground: oklch(0.5 0.01 264);
-  --accent: oklch(0.55 0.15 264);
-  --accent-foreground: oklch(0.99 0 0);
+  --accent: var(--pmu-gold);
+  --accent-foreground: var(--pmu-white);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.99 0 0);
   --border: oklch(0.88 0.005 264);
   --input: oklch(0.88 0.005 264);
-  --ring: oklch(0.55 0.15 264);
+  --ring: var(--pmu-blue);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
   --chart-4: oklch(0.828 0.189 84.429);
   --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.5rem;
+  --radius: 0.625rem;
   --sidebar: oklch(1 0 0);
   --sidebar-foreground: oklch(0.2 0.01 264);
-  --sidebar-primary: oklch(0.35 0.12 264);
-  --sidebar-primary-foreground: oklch(0.99 0 0);
+  --sidebar-primary: var(--pmu-blue);
+  --sidebar-primary-foreground: var(--pmu-white);
   --sidebar-accent: oklch(0.96 0.002 264);
   --sidebar-accent-foreground: oklch(0.2 0.01 264);
   --sidebar-border: oklch(0.88 0.005 264);
@@ -78,6 +105,15 @@
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  
+  /* PMU Colors */
+  --color-pmu-blue: var(--pmu-blue);
+  --color-pmu-gold: var(--pmu-gold);
+  --color-pmu-gray: var(--pmu-gray);
+  --color-pmu-white: var(--pmu-white);
+  --color-pmu-gold-dark: var(--pmu-gold-dark);
+  
+  /* Theme Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -102,10 +138,10 @@
   --color-chart-3: var(--chart-3);
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
   --color-sidebar: var(--sidebar);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar-primary: var(--sidebar-primary);

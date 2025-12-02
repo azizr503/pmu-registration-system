@@ -12,7 +12,7 @@ export function RegistrationDashboard() {
   const [currentPage, setCurrentPage] = useState("dashboard")
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-pmu-gray">
       <Header
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -25,7 +25,7 @@ export function RegistrationDashboard() {
           currentPage={currentPage}
           onNavigate={setCurrentPage}
         />
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-y-auto bg-pmu-gray">
           <DashboardContent />
         </main>
       </div>

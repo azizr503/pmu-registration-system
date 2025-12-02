@@ -29,14 +29,15 @@ export function Header({ onMenuClick, onToggleCollapse, isCollapsed }: HeaderPro
   }
 
   return (
-    <header className="bg-pmu-blue text-pmu-white shadow-lg sticky top-0 z-40">
-      <div className="flex items-center justify-between px-4 py-3">
-        <div className="flex items-center gap-3">
+    <header className="bg-pmu-blue text-pmu-white shadow-md sticky top-0 z-40 border-b border-pmu-blue/20">
+      <div className="flex items-center justify-between px-4 sm:px-6 py-3 h-20">
+        <div className="flex items-center gap-3 sm:gap-4">
           <Button
             variant="ghost"
             size="icon"
             onClick={onMenuClick}
-            className="lg:hidden text-pmu-white hover:bg-pmu-blue/90"
+            className="lg:hidden text-pmu-white hover:bg-pmu-blue/90 h-9 w-9"
+            aria-label="Toggle menu"
           >
             <Menu className="h-5 w-5" />
           </Button>
@@ -44,23 +45,27 @@ export function Header({ onMenuClick, onToggleCollapse, isCollapsed }: HeaderPro
             variant="ghost"
             size="icon"
             onClick={onToggleCollapse}
-            className="hidden lg:flex text-pmu-white hover:bg-pmu-blue/90"
+            className="hidden lg:flex text-pmu-white hover:bg-pmu-blue/90 h-9 w-9"
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
           </Button>
-          <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <div className="relative w-16 h-16 flex-shrink-0">
+          <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity" aria-label="Home">
+            <div className="relative h-14 w-14 flex-shrink-0 flex items-center justify-center">
               <img
-                src="/pmu-official-logo.png"
+                src="/pmu-exact-logo.png"
                 alt="PMU Official Logo"
-                width={64}
-                height={64}
-                className="object-contain w-full h-full"
+                width={56}
+                height={56}
+                className="object-contain h-full w-full"
               />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-lg font-bold leading-tight text-pmu-white">Prince Mohammad Bin Fahd University</h1>
+              <h1 className="text-lg font-semibold leading-tight">
+                <span className="text-pmu-white">Prince Mohammad Bin Fahd </span>
+                <span className="text-pmu-white font-bold">PMU</span>
+              </h1>
               <p className="text-sm text-pmu-gold font-medium">Student Registration System</p>
             </div>
           </Link>
