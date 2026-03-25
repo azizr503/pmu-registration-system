@@ -182,7 +182,7 @@ export default function CompleteProfilePage() {
   if (authLoading) {
     return (
       <AppLayout>
-        <div className="min-h-screen bg-pmu-gray flex items-center justify-center">
+        <div className="flex-1 bg-pmu-gray flex items-center justify-center">
           <div className="text-center">
             <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto mb-4" />
             <p className="text-muted-foreground">Loading...</p>
@@ -200,7 +200,7 @@ export default function CompleteProfilePage() {
 
   return (
     <AppLayout>
-      <div className="min-h-screen bg-pmu-gray">
+      <div className="flex-1 bg-pmu-gray">
         <div className="p-4 sm:p-6 lg:p-8 max-w-3xl mx-auto">
           {/* Page Title */}
           <div className="mb-6">

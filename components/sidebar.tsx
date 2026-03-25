@@ -27,6 +27,7 @@ interface SidebarProps {
   isCollapsed: boolean
   currentPage?: string
   onNavigate?: (page: string) => void
+  onClose?: () => void
 }
 
 interface MenuItem {
@@ -49,7 +50,7 @@ const menuItems: MenuItem[] = [
   { icon: Clock, label: "Courses Without Conflict" },
 ]
 
-export function Sidebar({ isOpen, isCollapsed }: SidebarProps) {
+export function Sidebar({ isOpen, isCollapsed, onClose }: SidebarProps) {
   const pathname = usePathname()
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set())
 
@@ -82,7 +83,13 @@ export function Sidebar({ isOpen, isCollapsed }: SidebarProps) {
   return (
     <>
       {/* Mobile overlay */}
-      {isOpen && <div className="fixed inset-0 bg-black/50 z-30 lg:hidden" onClick={() => {}} />}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
 
       {/* Sidebar */}
       <aside
@@ -94,6 +101,17 @@ export function Sidebar({ isOpen, isCollapsed }: SidebarProps) {
         )}
         aria-label="Main navigation"
       >
+        <div className="flex items-center justify-end px-2 py-2 lg:hidden">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label="Close sidebar"
+            className="text-sidebar-foreground hover:bg-sidebar-accent"
+          >
+            <span className="text-xl leading-none">×</span>
+          </Button>
+        </div>
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="space-y-1 px-2">
             {menuItems.map((item) => {

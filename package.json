@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "dev": "next dev",
+    "dev": "set NEXT_DISABLE_WEBPACK_CACHE=1&& set NODE_OPTIONS=--max_old_space_size=4096&& next dev",
     "lint": "next lint",
     "start": "next start",
     "backend:dev": "node backend/server.js"

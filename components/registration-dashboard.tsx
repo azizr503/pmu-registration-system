@@ -22,6 +22,7 @@ export function RegistrationDashboard() {
         <Sidebar
           isOpen={sidebarOpen}
           isCollapsed={sidebarCollapsed}
+          onClose={() => setSidebarOpen(false)}
           currentPage={currentPage}
           onNavigate={setCurrentPage}
         />

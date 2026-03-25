@@ -87,18 +87,9 @@ export default function RegisterContent() {
   }
 
   return (
-    <div className="min-h-screen bg-pmu-gray flex items-center justify-center p-4">
+    <div className="flex-1 bg-pmu-gray flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <img
-              src="/pmu-exact-logo.png"
-              alt="PMU Official Logo"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
-          </div>
           <h1 className="text-2xl font-bold text-pmu-blue">Student Registration</h1>
           <p className="text-gray-600 mt-2">
             Join <span className="text-pmu-blue font-semibold">PMU</span> Student Registration System

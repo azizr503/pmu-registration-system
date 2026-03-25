@@ -16,7 +16,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   return (
-    <div className="min-h-screen flex flex-col bg-pmu-gray">
+    <div className="flex flex-1 min-h-0 flex-col bg-pmu-gray">
       <Header
         onMenuClick={() => setSidebarOpen(!sidebarOpen)}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}

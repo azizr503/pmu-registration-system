@@ -52,21 +52,10 @@ export default function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen bg-pmu-gray flex items-center justify-center p-4 sm:p-6">
+    <div className="flex-1 bg-pmu-gray flex items-center justify-center p-4 sm:p-6">
       <div className="w-full max-w-md">
         {/* Logo and Welcome Section */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-6">
-            <div className="h-20 w-20 flex items-center justify-center">
-              <img
-                src="/pmu-exact-logo.png"
-                alt="PMU Official Logo"
-                width={80}
-                height={80}
-                className="object-contain h-full w-full"
-              />
-            </div>
-          </div>
           <h1 className="text-2xl font-semibold text-pmu-blue mb-2">Welcome Back</h1>
           <p className="text-muted-foreground text-sm sm:text-base">
             Sign in to your <span className="text-pmu-blue font-semibold">PMU</span> Student Account
@@ -131,7 +120,7 @@ export default function LoginContent() {
 
               <Button
                 type="submit"
-                className="w-full h-11 bg-pmu-gold text-pmu-white hover:bg-pmu-gold-dark font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-11 bg-white text-pmu-blue border border-border hover:bg-gray-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={isLoading}
                 aria-label="Sign in"
               >
