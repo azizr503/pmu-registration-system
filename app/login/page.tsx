@@ -3,7 +3,7 @@
 import { Suspense } from "react"
 import dynamic from "next/dynamic"
 
-const LoginContent = dynamic(() => import("./LoginContent"), { ssr: false })
+const LoginContent = dynamic(() => import("@/components/LoginContent"), { ssr: false })
 
 export default function LoginPage() {
   return (

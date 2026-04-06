@@ -3,7 +3,7 @@
 import { Suspense } from "react"
 import dynamic from "next/dynamic"
 
-const RegisterContent = dynamic(() => import("./RegisterContent"), { ssr: false })
+const RegisterContent = dynamic(() => import("@/components/RegisterContent"), { ssr: false })
 
 export default function RegisterPage() {
   return (

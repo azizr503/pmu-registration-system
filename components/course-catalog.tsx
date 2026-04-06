@@ -8,7 +8,7 @@ import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useRegistrationStore } from "@/lib/registration-store"
-import coursesData from "@/data/courses.json"
+import coursesData from "@/lib/constants/courses.json"
 
 interface Section {
   sectionId: string

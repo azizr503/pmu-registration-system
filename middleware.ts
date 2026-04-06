@@ -1,17 +1,14 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { PUBLIC_ROUTES } from '@/lib/constants/navigation'
 
 // Routes that should redirect authenticated users (public routes)
-const publicRoutes = [
-  '/login',
-  '/register'
-]
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   
   // Check if the route is public (doesn't require authentication)
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route))
+  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route))
   
   // Get the auth token
   const token = request.cookies.get('auth-token')?.value

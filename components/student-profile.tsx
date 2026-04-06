@@ -11,6 +11,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { useRegistrationStore } from "@/lib/registration-store"
 import { useAuth } from "@/lib/auth-context"
 import Link from "next/link"
+import { getProfileApi } from "@/lib/api/profile"
 
 interface StudentProfileData {
   id: string
@@ -53,26 +54,18 @@ export function StudentProfile() {
         setIsLoading(true)
         setError(null)
         
-        const response = await fetch('/api/profile')
-        
-        if (!response.ok) {
-          if (response.status === 401) {
-            setError("Please log in to view your profile")
-          } else if (response.status === 404) {
-            setError("Profile not found for this account")
-          } else {
-            const data = await response.json()
-            setError(data.error || "Failed to load profile")
-          }
-          setIsLoading(false)
-          return
-        }
-
-        const data = await response.json()
+        const data = await getProfileApi()
         setProfile(data.profile)
       } catch (err) {
         console.error('Error fetching profile:', err)
-        setError("Failed to load profile. Please try again later.")
+        const status = (err as Error & { status?: number }).status
+        if (status === 401) {
+          setError("Please log in to view your profile")
+        } else if (status === 404) {
+          setError("Profile not found for this account")
+        } else {
+          setError(err instanceof Error ? err.message : "Failed to load profile. Please try again later.")
+        }
       } finally {
         setIsLoading(false)
       }

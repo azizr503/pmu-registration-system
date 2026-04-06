@@ -12,6 +12,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, AlertCircle, CheckCircle2, User, Phone, MapPin, GraduationCap, Calendar, Globe } from "lucide-react"
+import { updateProfileApi } from "@/lib/api/profile"
 
 interface FormData {
   firstName: string
@@ -147,19 +148,7 @@ export default function CompleteProfilePage() {
         email: user.email,
       }
 
-      const response = await fetch("/api/profile", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(submitData),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to save profile")
-      }
+      await updateProfileApi(submitData)
 
       setSuccess(true)
       // Redirect to profile page after 1.5 seconds

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Users, UserPlus, Calendar, Mail } from 'lucide-react'
 import Link from 'next/link'
+import { getAdminUsersApi } from '@/lib/api/admin'
 
 interface AdminUser {
   id: string
@@ -29,11 +30,7 @@ export default function AdminDashboard() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/admin/users')
-      if (!response.ok) {
-        throw new Error('Failed to fetch users')
-      }
-      const data = await response.json()
+      const data = await getAdminUsersApi()
       setUsers(data.users)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch users')

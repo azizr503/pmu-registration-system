@@ -13,7 +13,8 @@ import { TypingIndicator } from "@/components/ui/typing-indicator"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/lib/auth-context"
 import { useRegistrationStore } from "@/lib/registration-store"
-import coursesData from "@/data/courses.json"
+import coursesData from "@/lib/constants/courses.json"
+import { sendChatMessageApi } from "@/lib/api/chat"
 
 type ChatFlowType =
   | "NONE"
@@ -411,22 +412,7 @@ export function AIChatbot() {
       }))
 
       // Call the chat API
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: conversationHistory,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}))
-        throw new Error(errorData.error || "Failed to get response from assistant")
-      }
-
-      const data = await response.json()
+      const data = await sendChatMessageApi(conversationHistory)
       const assistantMessage: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
