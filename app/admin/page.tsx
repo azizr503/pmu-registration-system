@@ -54,7 +54,7 @@ export default function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-pmu-gray flex items-center justify-center">
+      <div className="flex-1 bg-pmu-gray flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pmu-blue mx-auto mb-4"></div>
           <p className="text-pmu-blue">Loading admin dashboard...</p>
@@ -64,7 +64,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-pmu-gray">
+    <div className="flex-1 bg-pmu-gray">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
