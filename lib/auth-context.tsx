@@ -7,7 +7,7 @@ import { loginApi, logoutApi, meApi } from '@/lib/api/auth'
 interface AuthContextType {
   user: AuthUser | null
   isLoading: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string) => Promise<{ user: AuthUser }>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
 }
@@ -30,8 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const login = async (email: string, password: string) => {
-    const data = await loginApi({ email, password })
+    const data = (await loginApi({ email, password })) as { user: AuthUser }
     setUser(data.user)
+    return data
   }
 
   const logout = async () => {
@@ -47,6 +48,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     refreshUser()
   }, [])
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      void refreshUser()
+    }, 9 * 60 * 1000)
+    return () => window.clearInterval(id)
+  }, [refreshUser])
 
   return (
     <AuthContext.Provider value={{ user, isLoading, login, logout, refreshUser }}>

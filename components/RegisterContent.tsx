@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useAuth } from '@/lib/auth-context'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,12 +9,13 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, User, Mail, Lock, UserCheck } from 'lucide-react'
+import { toast } from 'sonner'
 import { registerApi } from '@/lib/api/auth'
+import { normalizePmuEmail } from '@/lib/email-normalize'
 
 export default function RegisterContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { refreshUser } = useAuth()
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -58,15 +58,19 @@ export default function RegisterContent() {
     }
 
     try {
-      await registerApi({
+      const res = (await registerApi({
         firstName: formData.firstName,
         lastName: formData.lastName,
-        email: formData.email,
+        email: normalizePmuEmail(formData.email),
         password: formData.password,
-      })
+      })) as { pendingActivation?: boolean; message?: string }
 
-      // Registration successful, refresh user context and redirect to the intended page or home
-      await refreshUser()
+      if (res.pendingActivation) {
+        toast.success(res.message || 'Account created — pending activation.')
+        router.push('/login')
+        return
+      }
+
       router.push(redirectTo)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed')

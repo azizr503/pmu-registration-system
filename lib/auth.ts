@@ -1,141 +1,178 @@
 import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
-import { NextRequest } from 'next/server'
-import type { AuthUser, User } from '@/types/auth'
+import type { NextRequest } from 'next/server'
+import type { AuthUser, UserRole, UserStatus } from '@/types/auth'
+import { AUTH_COOKIE_NAME, authCookieOptions } from '@/lib/auth-cookie'
+import { getDb } from '@/lib/db'
+import { signAuthToken, verifyAuthToken, claimsToAuthUser } from '@/lib/jwt'
+import { inferRoleFromEmail } from '@/lib/role-email'
 
-export type { AuthUser, User }
+export { AUTH_COOKIE_NAME, authCookieOptions, AUTH_SESSION_MAX_AGE_SEC } from '@/lib/auth-cookie'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production'
-
-// In-memory storage for development/demo (resets on server restart)
-// Note: Profile API reads from JSON file, but login uses in-memory storage
-let usersStorage: User[] = [
-  // Add your existing user data here if you want to preserve it
-  {
-    "id": "e1304350-f916-45a1-a1e2-372f8bdd9772",
-    "email": "aziz.saleh@pmu.edu.sa",
-    "password": "$2b$12$6YBwKVjUv7xjqLlrW36LH.fEBtAN4FQKGhDO9iE6kbW2mYDATQqti",
-    "firstName": "aziz",
-    "lastName": "sale",
-    "studentId": "20256341",
-    "createdAt": "2025-10-14T21:31:51.224Z"
-  }
-]
-
-// Ensure a known demo account exists in development.
-// This avoids "Invalid email or password" when in-memory storage resets.
-if (process.env.NODE_ENV !== 'production') {
-  const demoEmail = 'demo.student@pmu.edu.sa'
-  const hasDemo = usersStorage.some(u => u.email.toLowerCase() === demoEmail)
-  if (!hasDemo) {
-    usersStorage.unshift({
-      id: 'demo-user',
-      email: demoEmail,
-      // demo password: Pmu@12345
-      password: bcrypt.hashSync('Pmu@12345', 12),
-      firstName: 'Demo',
-      lastName: 'Student',
-      studentId: '20250000',
-      createdAt: new Date().toISOString(),
-    })
-  }
+function splitFullName(full: string): { firstName: string; lastName: string } {
+  const t = full.trim()
+  if (!t) return { firstName: '', lastName: '' }
+  const parts = t.split(/\s+/)
+  if (parts.length === 1) return { firstName: parts[0], lastName: '' }
+  return { firstName: parts[0], lastName: parts.slice(1).join(' ') }
 }
 
-// Read users from JSON file (for API routes)
-export async function getUsersFromFile(): Promise<User[]> {
-  try {
-    const fs = await import('fs/promises')
-    const path = await import('path')
-    const filePath = path.join(process.cwd(), 'lib', 'constants', 'users.json')
-    const fileContent = await fs.readFile(filePath, 'utf-8')
-    return JSON.parse(fileContent) as User[]
-  } catch (error) {
-    console.error('Error reading users file:', error)
-    // Fallback to in-memory storage
-    return usersStorage
+function rowToAuthUser(row: {
+  id: string
+  email: string
+  role: UserRole
+  status: UserStatus
+  student_id: string | null
+  faculty_id: string | null
+  full_name: string | null
+  profile_completed: number | null
+}): AuthUser {
+  const name = row.full_name || row.email.split('@')[0]
+  const { firstName, lastName } = splitFullName(name)
+  return {
+    id: row.id,
+    email: row.email,
+    firstName,
+    lastName,
+    role: row.role,
+    status: row.status,
+    studentId: row.student_id ?? undefined,
+    facultyId: row.faculty_id ?? undefined,
+    profileCompleted: row.role === 'student' ? Boolean(row.profile_completed) : true,
   }
 }
 
-// Read users from storage
-export async function getUsers(): Promise<User[]> {
-  // For production, you can integrate with a database
-  // For now, using in-memory storage that works on Vercel
-  return usersStorage
+export function getAuthUserById(id: string): AuthUser | null {
+  const db = getDb()
+  const row = db
+    .prepare(
+      `SELECT u.id, u.email, u.role, u.status,
+              s.student_id, s.full_name AS sname, s.profile_completed,
+              f.faculty_id, f.full_name AS fname
+       FROM users u
+       LEFT JOIN students s ON s.user_id = u.id
+       LEFT JOIN faculty f ON f.user_id = u.id
+       WHERE u.id = ?`
+    )
+    .get(id) as
+    | {
+        id: string
+        email: string
+        role: UserRole
+        status: UserStatus
+        student_id: string | null
+        sname: string | null
+        profile_completed: number | null
+        faculty_id: string | null
+        fname: string | null
+      }
+    | undefined
+
+  if (!row) return null
+
+  const full_name = row.sname || row.fname
+  return rowToAuthUser({
+    id: row.id,
+    email: row.email,
+    role: row.role,
+    status: row.status,
+    student_id: row.student_id,
+    faculty_id: row.faculty_id,
+    full_name,
+    profile_completed: row.profile_completed,
+  })
 }
 
-// Get user by ID or email
-export async function getUserById(id: string): Promise<User | null> {
-  const users = await getUsersFromFile()
-  return users.find(u => u.id === id) || null
+export function getCredentialByEmail(
+  email: string
+): { user: AuthUser; password_hash: string } | null {
+  const db = getDb()
+  const row = db
+    .prepare(`SELECT id, password_hash FROM users WHERE lower(email) = lower(?)`)
+    .get(email) as { id: string; password_hash: string } | undefined
+  if (!row) return null
+  const user = getAuthUserById(row.id)
+  if (!user) return null
+  return { user, password_hash: row.password_hash }
 }
 
-export async function getUserByEmail(email: string): Promise<User | null> {
-  const users = await getUsersFromFile()
-  return users.find(u => u.email.toLowerCase() === email.toLowerCase()) || null
+export function getAuthUserByEmail(email: string): AuthUser | null {
+  const db = getDb()
+  const row = db
+    .prepare(
+      `SELECT u.id, u.email, u.role, u.status,
+              s.student_id, s.full_name AS sname, s.profile_completed,
+              f.faculty_id, f.full_name AS fname
+       FROM users u
+       LEFT JOIN students s ON s.user_id = u.id
+       LEFT JOIN faculty f ON f.user_id = u.id
+       WHERE lower(u.email) = lower(?)`
+    )
+    .get(email) as
+    | {
+        id: string
+        email: string
+        role: UserRole
+        status: UserStatus
+        student_id: string | null
+        sname: string | null
+        profile_completed: number | null
+        faculty_id: string | null
+        fname: string | null
+      }
+    | undefined
+
+  if (!row) return null
+
+  const full_name = row.sname || row.fname
+  return rowToAuthUser({
+    id: row.id,
+    email: row.email,
+    role: row.role,
+    status: row.status,
+    student_id: row.student_id,
+    faculty_id: row.faculty_id,
+    full_name,
+    profile_completed: row.profile_completed,
+  })
 }
 
-export async function getUserByStudentId(studentId: string): Promise<User | null> {
-  const users = await getUsersFromFile()
-  return users.find(u => u.studentId === studentId) || null
-}
-
-// Write users to storage
-export async function saveUsers(users: User[]): Promise<void> {
-  // For production, you can integrate with a database
-  // For now, using in-memory storage that works on Vercel
-  usersStorage = users
-}
-
-// Hash password
 export async function hashPassword(password: string): Promise<string> {
-  const saltRounds = 12
-  return bcrypt.hash(password, saltRounds)
+  return bcrypt.hash(password, 12)
 }
 
-// Verify password
 export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
   return bcrypt.compare(password, hashedPassword)
 }
 
-// Generate JWT token
-export function generateToken(user: AuthUser): string {
-  return jwt.sign(user, JWT_SECRET, { expiresIn: '7d' })
+export async function createSessionToken(user: AuthUser): Promise<string> {
+  return signAuthToken(user)
 }
 
-// Verify JWT token
-export function verifyToken(token: string): AuthUser | null {
-  try {
-    return jwt.verify(token, JWT_SECRET) as AuthUser
-  } catch {
-    return null
-  }
-}
-
-// Get user from request
 export async function getUserFromRequest(request: NextRequest): Promise<AuthUser | null> {
-  const token = request.cookies.get('auth-token')?.value
-  
-  if (!token) {
-    return null
-  }
-  
-  return verifyToken(token)
+  const token = request.cookies.get(AUTH_COOKIE_NAME)?.value
+  if (!token) return null
+  const claims = await verifyAuthToken(token)
+  if (!claims) return null
+  const fresh = getAuthUserById(claims.sub)
+  if (!fresh || fresh.status !== 'active') return null
+  return fresh
 }
 
-// Validate PMU email
+/** Same as getUserFromRequest but returns claims if DB row missing (edge) */
+export async function getClaimsFromRequest(request: NextRequest) {
+  const token = request.cookies.get(AUTH_COOKIE_NAME)?.value
+  if (!token) return null
+  const claims = await verifyAuthToken(token)
+  return claims
+}
+
 export function isValidPMUEmail(email: string): boolean {
   return email.toLowerCase().endsWith('@pmu.edu.sa')
 }
 
-// Generate student ID
-export function generateStudentId(): string {
-  const year = new Date().getFullYear()
-  const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0')
-  return `${year}${random}`
+export function touchLastLogin(userId: string) {
+  const db = getDb()
+  db.prepare('UPDATE users SET last_login = ? WHERE id = ?').run(new Date().toISOString(), userId)
 }
 
-// Sanitize user data (remove password)
-export function sanitizeUser(user: User): AuthUser {
-  const { password, ...sanitizedUser } = user
-  return sanitizedUser
-}
+export { verifyAuthToken, claimsToAuthUser, inferRoleFromEmail }

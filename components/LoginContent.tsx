@@ -7,9 +7,10 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, Mail, Lock } from 'lucide-react'
+import { getPostLoginPath } from '@/lib/constants/navigation'
+import { normalizePmuEmail } from '@/lib/email-normalize'
 
 export default function LoginContent() {
   const router = useRouter()
@@ -17,21 +18,29 @@ export default function LoginContent() {
   const { login } = useAuth()
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  
-  // Get redirect URL from search params
+
   const redirectTo = searchParams.get('redirect') || '/'
+  const roleParam = (searchParams.get('role') || '').toLowerCase()
+
+  const signInHeadline =
+    roleParam === 'faculty'
+      ? 'Sign in to your PMU Faculty Account'
+      : roleParam === 'student'
+        ? 'Sign in to your PMU Student Account'
+        : roleParam === 'admin'
+          ? 'Sign in to your PMU Account'
+          : 'Sign in to your PMU Account'
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
-    // Clear error when user starts typing
     if (error) setError('')
   }
 
@@ -41,9 +50,8 @@ export default function LoginContent() {
     setError('')
 
     try {
-      await login(formData.email, formData.password)
-      // Login successful, redirect to the intended page or home
-      router.push(redirectTo)
+      const data = await login(normalizePmuEmail(formData.email), formData.password)
+      router.push(getPostLoginPath(data.user, redirectTo))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
     } finally {
@@ -52,105 +60,114 @@ export default function LoginContent() {
   }
 
   return (
-    <div className="flex-1 bg-pmu-gray flex items-center justify-center p-4 sm:p-6">
-      <div className="w-full max-w-md">
-        {/* Logo and Welcome Section */}
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-semibold text-pmu-blue mb-2">Welcome Back</h1>
-          <p className="text-muted-foreground text-sm sm:text-base">
-            Sign in to your <span className="text-pmu-blue font-semibold">PMU</span> Student Account
-          </p>
+    <div className="min-h-screen w-full bg-[#f0f2f5] text-[#1e2a3a]">
+      <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-8 sm:px-6">
+        {/* Intro copy on light gray (not on the dark card) */}
+        <div className="mb-6 text-center">
+          <h1 className="text-xl font-semibold text-[#1a5fb4] sm:text-2xl">Welcome Back</h1>
+          <p className="mt-2 text-sm text-[#4a5568] sm:text-base">{signInHeadline}</p>
         </div>
 
-        {/* Login Card */}
-        <Card className="shadow-lg border border-border bg-card">
-          <CardHeader className="space-y-1 pb-6">
-            <CardTitle className="text-xl font-semibold text-center">Sign In</CardTitle>
-            <CardDescription className="text-center text-muted-foreground">
-              Enter your credentials to continue
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
+        {/* Dark navy card: campus banner strip + Sign In form (login page only) */}
+        <div className="w-full max-w-[480px] self-center overflow-hidden rounded-xl bg-[#1e2a3a] shadow-xl">
+          <div className="w-full border-b border-white/10 bg-[#1e2a3a]">
+            <img
+              src="/img/login-banner.png"
+              alt=""
+              className="h-[72px] w-full object-cover object-left sm:h-[80px]"
+            />
+          </div>
+          <div className="p-6 sm:p-8">
+            <div className="mb-6 text-center">
+              <h2 className="text-lg font-semibold text-white">Sign In</h2>
+              <p className="mt-1 text-sm text-white/70">Use your PMU Email ID without @pmu.edu.sa</p>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-5">
-              {error && (
-                <Alert variant="destructive" className="mb-4">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
+            {error && (
+              <Alert variant="destructive" className="border-red-400/50 bg-red-950/50 text-white">
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-sm font-medium text-white/90">
+                Email Address
+              </Label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="h-11 border-white/20 bg-white/10 pl-10 text-white placeholder:text-white/40 focus-visible:ring-[#1a5fb4]"
+                  placeholder="s.202012345 or first.last"
+                  aria-label="Email address"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-sm font-medium text-white/90">
+                Password
+              </Label>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50" />
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  required
+                  autoComplete="current-password"
+                  value={formData.password}
+                  onChange={handleInputChange}
+                  className="h-11 border-white/20 bg-white/10 pl-10 text-white placeholder:text-white/40 focus-visible:ring-[#1a5fb4]"
+                  placeholder="Enter your password"
+                  aria-label="Password"
+                />
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              className="h-11 w-full bg-[#1a5fb4] font-medium text-white hover:bg-[#154a96]"
+              disabled={isLoading}
+              aria-label="Sign in"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Signing In...
+                </>
+              ) : (
+                'Sign In'
               )}
-
-              <div className="space-y-2">
-                <Label htmlFor="email" className="text-sm font-medium text-foreground">
-                  Email Address
-                </Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="pl-10 h-11 border-border focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                    placeholder="student@pmu.edu.sa"
-                    aria-label="Email address"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="password" className="text-sm font-medium text-foreground">
-                  Password
-                </Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="password"
-                    name="password"
-                    type="password"
-                    required
-                    value={formData.password}
-                    onChange={handleInputChange}
-                    className="pl-10 h-11 border-border focus:ring-2 focus:ring-primary focus:border-primary transition-all"
-                    placeholder="Enter your password"
-                    aria-label="Password"
-                  />
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                className="w-full h-11 bg-white text-pmu-blue border border-border hover:bg-gray-50 font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading}
-                aria-label="Sign in"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Signing In...
-                  </>
-                ) : (
-                  'Sign In'
-                )}
-              </Button>
+            </Button>
             </form>
 
-            {/* Registration Link */}
-            <div className="pt-4 border-t border-border">
-              <p className="text-sm text-center text-muted-foreground">
-                Don't have an account?{' '}
-                <Link 
-                  href="/register" 
-                  className="font-medium text-pmu-gold hover:text-pmu-gold-dark transition-colors underline-offset-4 hover:underline"
-                >
-                  Create one
-                </Link>
-              </p>
+            <div className="mt-6 border-t border-white/10 pt-6 text-center">
+            <p className="text-sm text-white/70">
+              Need help?{' '}
+              <a
+                href="mailto:itsupport@pmu.edu.sa"
+                className="font-medium text-[#e05a00] underline-offset-4 hover:underline"
+              >
+                Contact IT Support
+              </a>
+            </p>
+            <p className="mt-4 text-center text-sm text-white/50">
+              <Link href="/" className="hover:text-white/80">
+                ← Back to home
+              </Link>
+            </p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
     </div>
   )
 }
-

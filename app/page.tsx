@@ -1,5 +1,5 @@
-import { RegistrationDashboard } from "@/components/registration-dashboard"
+import { LandingPage } from '@/components/landing/LandingPage'
 
 export default function Home() {
-  return <RegistrationDashboard />
+  return <LandingPage />
 }
