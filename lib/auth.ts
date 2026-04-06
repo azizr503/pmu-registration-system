@@ -49,6 +49,25 @@ let usersStorage: User[] = [
   }
 ]
 
+// Ensure a known demo account exists in development.
+// This avoids "Invalid email or password" when in-memory storage resets.
+if (process.env.NODE_ENV !== 'production') {
+  const demoEmail = 'demo.student@pmu.edu.sa'
+  const hasDemo = usersStorage.some(u => u.email.toLowerCase() === demoEmail)
+  if (!hasDemo) {
+    usersStorage.unshift({
+      id: 'demo-user',
+      email: demoEmail,
+      // demo password: Pmu@12345
+      password: bcrypt.hashSync('Pmu@12345', 12),
+      firstName: 'Demo',
+      lastName: 'Student',
+      studentId: '20250000',
+      createdAt: new Date().toISOString(),
+    })
+  }
+}
+
 // Read users from JSON file (for API routes)
 export async function getUsersFromFile(): Promise<User[]> {
   try {

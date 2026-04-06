@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
-import Image from "next/image"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter } from "next/navigation"
 
@@ -52,15 +51,6 @@ export function Header({ onMenuClick, onToggleCollapse, isCollapsed }: HeaderPro
             {isCollapsed ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
           </Button>
           <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity" aria-label="Home">
-            <div className="relative h-14 w-14 flex-shrink-0 flex items-center justify-center">
-              <img
-                src="/pmu-exact-logo.png"
-                alt="PMU Official Logo"
-                width={56}
-                height={56}
-                className="object-contain h-full w-full"
-              />
-            </div>
             <div className="hidden sm:block">
               <h1 className="text-lg font-semibold leading-tight">
                 <span className="text-pmu-white">Prince Mohammad Bin Fahd </span>
