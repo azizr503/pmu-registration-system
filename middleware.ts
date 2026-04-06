@@ -1,51 +1,98 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { PUBLIC_ROUTES } from '@/lib/constants/navigation'
+import { verifyAuthToken, rotateAuthToken } from '@/lib/jwt'
+import { AUTH_COOKIE_NAME, authCookieOptions } from '@/lib/auth-cookie'
+import { roleHomePath } from '@/lib/constants/navigation'
+import type { UserRole } from '@/types/auth'
 
-// Routes that should redirect authenticated users (public routes)
+const PUBLIC_PREFIXES = ['/login', '/register']
 
-export function middleware(request: NextRequest) {
+function isPublic(pathname: string) {
+  return PUBLIC_PREFIXES.some(p => pathname === p || pathname.startsWith(`${p}/`))
+}
+
+function homeForClaims(claims: { role: string; profileCompleted?: boolean | number }) {
+  const pc =
+    typeof claims.profileCompleted === 'boolean'
+      ? claims.profileCompleted
+      : Boolean(claims.profileCompleted)
+  if (claims.role === 'student' && !pc) {
+    return '/student/profile-setup'
+  }
+  return roleHomePath(claims.role as UserRole)
+}
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
-  
-  // Check if the route is public (doesn't require authentication)
-  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route))
-  
-  // Get the auth token
-  const token = request.cookies.get('auth-token')?.value
-  
-  // If accessing a public route with a valid token, redirect to home
-  if (isPublicRoute && token) {
-    try {
-      // Basic token validation (just check if it exists and is not empty)
-      if (token.trim()) {
-        const homeUrl = new URL('/', request.url)
-        return NextResponse.redirect(homeUrl)
+  const token = request.cookies.get(AUTH_COOKIE_NAME)?.value
+
+  // Public landing: guests see Banner-style home; signed-in users go to their portal
+  if (pathname === '/') {
+    if (token) {
+      const claims = await verifyAuthToken(token)
+      if (claims) {
+        return NextResponse.redirect(new URL(homeForClaims(claims), request.url))
       }
-    } catch {
-      // Token is invalid, continue to auth page
+    }
+    return NextResponse.next()
+  }
+
+  if (isPublic(pathname)) {
+    if (token) {
+      const claims = await verifyAuthToken(token)
+      if (claims) {
+        return NextResponse.redirect(new URL(homeForClaims(claims), request.url))
+      }
+    }
+    return NextResponse.next()
+  }
+
+  if (!token) {
+    const login = new URL('/login', request.url)
+    login.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(login)
+  }
+
+  const claims = await verifyAuthToken(token)
+  if (!claims) {
+    const login = new URL('/login', request.url)
+    login.searchParams.set('redirect', pathname)
+    return NextResponse.redirect(login)
+  }
+
+  const role = claims.role as UserRole
+
+  if (pathname.startsWith('/student')) {
+    if (role !== 'student') {
+      return NextResponse.redirect(new URL(roleHomePath(role), request.url))
+    }
+    if (
+      !pathname.startsWith('/student/profile-setup') &&
+      !claims.profileCompleted &&
+      role === 'student'
+    ) {
+      return NextResponse.redirect(new URL('/student/profile-setup', request.url))
     }
   }
-  
-  // If accessing any route that's not public without a token, redirect to login
-  if (!isPublicRoute && !token) {
-    const loginUrl = new URL('/login', request.url)
-    loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
+
+  if (pathname.startsWith('/faculty') && role !== 'faculty') {
+    return NextResponse.redirect(new URL(roleHomePath(role), request.url))
   }
-  
-  return NextResponse.next()
+
+  if (pathname.startsWith('/admin') && role !== 'admin') {
+    return NextResponse.redirect(new URL(roleHomePath(role), request.url))
+  }
+
+  const rotated = await rotateAuthToken(token)
+  const res = NextResponse.next()
+  if (rotated) {
+    res.cookies.set(AUTH_COOKIE_NAME, rotated, authCookieOptions())
+  }
+  return res
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - static assets (e.g. png/jpg/css/js/fonts)
-     */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|css|js|map|txt|woff2?|ttf|eot)).*)',
   ],
 }

@@ -5,6 +5,8 @@ import { Analytics } from '@vercel/analytics/next'
 import { AuthProvider } from '@/lib/auth-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { TopBar } from '@/components/top-bar'
+import { ConditionalFooter } from '@/components/ConditionalFooter'
+import { Toaster } from '@/components/ui/sonner'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -19,21 +21,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`min-h-screen flex flex-col font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <html lang="en" suppressHydrationWarning className="light">
+      <body className={`min-h-screen flex flex-col bg-[#f5f5f5] font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
+        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
           <AuthProvider>
+            <Toaster richColors position="top-center" />
             <TopBar />
             <div className="flex-1 min-h-0 flex flex-col">{children}</div>
-            <footer className="border-t border-border/60 bg-white dark:bg-white">
-              <div className="w-full py-0">
-                <img
-                  src="/underpagebuildingpmu.png"
-                  alt="Under page building"
-                  className="block h-auto w-full object-contain"
-                />
-              </div>
-            </footer>
+            <ConditionalFooter />
           </AuthProvider>
         </ThemeProvider>
         <Analytics />

@@ -1,22 +1,15 @@
-export interface User {
+export type UserRole = 'student' | 'faculty' | 'admin'
+export type UserStatus = 'active' | 'inactive'
+
+/** Database row shape (password_hash never sent to client) */
+export interface DbUser {
   id: string
   email: string
-  password: string
-  firstName: string
-  lastName: string
-  studentId: string
-  createdAt: string
-  phone?: string
-  address?: string
-  major?: string
-  minor?: string
-  enrollmentDate?: string
-  expectedGraduation?: string
-  gpa?: number
-  completedCredits?: number
-  requiredCredits?: number
-  academicStanding?: string
-  completedCourses?: string[]
+  password_hash: string
+  role: UserRole
+  status: UserStatus
+  created_at: string
+  last_login: string | null
 }
 
 export interface AuthUser {
@@ -24,37 +17,10 @@ export interface AuthUser {
   email: string
   firstName: string
   lastName: string
-  studentId: string
+  role: UserRole
+  status: UserStatus
+  studentId?: string
+  facultyId?: string
+  /** Students only: false until profile setup is saved */
+  profileCompleted: boolean
 }
-
-export interface User {
-  id: string
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-  studentId: string
-  createdAt: string
-  role?: 'admin' | 'student'
-  phone?: string
-  address?: string
-  major?: string
-  minor?: string
-  enrollmentDate?: string
-  expectedGraduation?: string
-  gpa?: number
-  completedCredits?: number
-  requiredCredits?: number
-  academicStanding?: string
-  completedCourses?: string[]
-}
-
-export interface AuthUser {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  studentId: string
-  role?: 'admin' | 'student'
-}
-

@@ -10,7 +10,11 @@
   --pmu-gray: #F4F4F4;
   --pmu-white: #FFFFFF;
   --pmu-gold-dark: #B07E10;
-  
+  /* Dual-portal branding */
+  --portal-primary: #1a5fb4;
+  --portal-accent: #e05a00;
+  --login-card: #1e2a3a;
+
   /* Design System - Spacing */
   --spacing-xs: 0.25rem;    /* 4px */
   --spacing-sm: 0.5rem;     /* 8px */
@@ -68,7 +72,7 @@
 }
 
 .dark {
-  /* Tuned to match underpagebuildingpmu.png blue tone */
+  /* Tuned to match public/img/underpagebuildingpmu.png blue tone */
   --background: #243845;
   --foreground: #f3f7fb;
   --card: #2a3f4e;
