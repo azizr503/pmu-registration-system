@@ -1,7 +1,8 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
-import { AuthUser } from './auth'
+import type { AuthUser } from '@/types/auth'
+import { loginApi, logoutApi, meApi } from '@/lib/api/auth'
 
 interface AuthContextType {
   user: AuthUser | null
@@ -19,13 +20,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const refreshUser = async () => {
     try {
-      const response = await fetch('/api/auth/me')
-      if (response.ok) {
-        const userData = await response.json()
-        setUser(userData.user)
-      } else {
-        setUser(null)
-      }
+      const userData = await meApi()
+      setUser(userData.user)
     } catch {
       setUser(null)
     } finally {
@@ -34,24 +30,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.error || 'Login failed')
-    }
-
-    const data = await response.json()
+    const data = await loginApi({ email, password })
     setUser(data.user)
   }
 
   const logout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' })
+      await logoutApi()
     } catch (error) {
       console.error('Logout error:', error)
     } finally {

@@ -2,7 +2,7 @@
 
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
-import coursesData from "@/data/courses.json"
+import coursesData from "@/lib/constants/courses.json"
 
 interface Section {
   sectionId: string

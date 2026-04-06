@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Loader2, User, Mail, Lock, UserCheck } from 'lucide-react'
+import { registerApi } from '@/lib/api/auth'
 
 export default function RegisterContent() {
   const router = useRouter()
@@ -57,24 +58,12 @@ export default function RegisterContent() {
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
-          password: formData.password
-        })
+      await registerApi({
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        email: formData.email,
+        password: formData.password,
       })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Registration failed')
-      }
 
       // Registration successful, refresh user context and redirect to the intended page or home
       await refreshUser()

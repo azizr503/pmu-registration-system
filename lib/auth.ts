@@ -1,38 +1,11 @@
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import { NextRequest } from 'next/server'
+import type { AuthUser, User } from '@/types/auth'
+
+export type { AuthUser, User }
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-super-secret-jwt-key-change-in-production'
-
-export interface User {
-  id: string
-  email: string
-  password: string
-  firstName: string
-  lastName: string
-  studentId: string
-  createdAt: string
-  // Optional academic profile fields
-  phone?: string
-  address?: string
-  major?: string
-  minor?: string
-  enrollmentDate?: string
-  expectedGraduation?: string
-  gpa?: number
-  completedCredits?: number
-  requiredCredits?: number
-  academicStanding?: string
-  completedCourses?: string[]
-}
-
-export interface AuthUser {
-  id: string
-  email: string
-  firstName: string
-  lastName: string
-  studentId: string
-}
 
 // In-memory storage for development/demo (resets on server restart)
 // Note: Profile API reads from JSON file, but login uses in-memory storage
@@ -73,7 +46,7 @@ export async function getUsersFromFile(): Promise<User[]> {
   try {
     const fs = await import('fs/promises')
     const path = await import('path')
-    const filePath = path.join(process.cwd(), 'data', 'users.json')
+    const filePath = path.join(process.cwd(), 'lib', 'constants', 'users.json')
     const fileContent = await fs.readFile(filePath, 'utf-8')
     return JSON.parse(fileContent) as User[]
   } catch (error) {

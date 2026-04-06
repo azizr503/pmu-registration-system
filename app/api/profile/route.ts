@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
 
     // Save to file
     try {
-      const filePath = path.join(process.cwd(), 'data', 'users.json')
+      const filePath = path.join(process.cwd(), 'lib', 'constants', 'users.json')
       await fs.mkdir(path.dirname(filePath), { recursive: true })
       await fs.writeFile(filePath, JSON.stringify(users, null, 2), 'utf-8')
     } catch (fileError) {

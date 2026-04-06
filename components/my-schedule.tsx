@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { useRegistrationStore } from "@/lib/registration-store"
+import { DAYS, DAY_CODES, TIME_SLOTS } from "@/lib/constants/schedule"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,17 +19,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
-
-const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
-const DAY_CODES: Record<string, string> = {
-  M: "Monday",
-  T: "Tuesday",
-  W: "Wednesday",
-  R: "Thursday",
-  F: "Friday",
-}
-
-const TIME_SLOTS = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00"]
 
 export function MySchedule() {
   const { registeredSections, dropSection, getTotalCredits } = useRegistrationStore()
