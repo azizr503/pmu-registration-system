@@ -35,36 +35,48 @@ export default function StudentDashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div className="rounded-lg border border-[#e05a00]/40 bg-[#e05a00]/10 px-4 py-3 text-[#b34700] dark:text-[#ffb366]">
+      <div className="rounded-lg border border-[#1a5fb4]/30 bg-[#1a5fb4] px-4 py-3 text-white">
         <p className="font-semibold">
-          Hello, {data.student.name} — {sem} Registration is {data.registration.isOpen ? 'OPEN' : 'CLOSED'}
+          📢 Hello, {data.student.name} — {sem} Registration is {data.registration.isOpen ? 'OPEN' : 'CLOSED'}
         </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card>
+        <Card className="border-t-4 border-t-[#1a5fb4]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Registered Credits</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold text-[#1a5fb4]">{data.student.registeredCredits}</CardContent>
+          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4]">
+            <span>{data.student.registeredCredits}</span>
+            <span aria-hidden>📚</span>
+          </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-[#15803d]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">GPA</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold text-[#1a5fb4]">{data.student.gpa.toFixed(2)}</CardContent>
+          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4]">
+            <span>{data.student.gpa.toFixed(2)}</span>
+            <span aria-hidden>📊</span>
+          </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-[#7c3aed]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Completed Hours</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold text-[#1a5fb4]">{data.student.creditsCompleted}</CardContent>
+          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4]">
+            <span>{data.student.creditsCompleted}</span>
+            <span aria-hidden>✅</span>
+          </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-[#e05a00]">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Remaining Hours</CardTitle>
           </CardHeader>
-          <CardContent className="text-2xl font-bold text-[#1a5fb4]">{data.student.remainingHours}</CardContent>
+          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4]">
+            <span>{data.student.remainingHours}</span>
+            <span aria-hidden>🎯</span>
+          </CardContent>
         </Card>
       </div>
 
@@ -92,14 +104,14 @@ export default function StudentDashboardPage() {
             <CardTitle>Quick links</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-            <Button asChild className="bg-[#1a5fb4] hover:bg-[#154a96]">
-              <Link href="/student/register">Register Now</Link>
+            <Button asChild className="w-full justify-start bg-[#1a5fb4] hover:bg-[#154a96]">
+              <Link href="/student/register">📚 Register Now</Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/student/schedule">View Schedule</Link>
+            <Button asChild variant="outline" className="w-full justify-start">
+              <Link href="/student/schedule">🗓️ View Schedule</Link>
             </Button>
-            <Button asChild variant="outline" className="border-[#e05a00] text-[#e05a00] hover:bg-[#e05a00]/10">
-              <Link href="/student/chatbot">AI Assistant</Link>
+            <Button asChild className="w-full justify-start bg-[#e05a00] text-white hover:bg-[#c94f00]">
+              <Link href="/student/chatbot">🤖 AI Assistant</Link>
             </Button>
           </CardContent>
         </Card>

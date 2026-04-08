@@ -23,7 +23,13 @@ export async function GET(request: NextRequest) {
     const rows = db
       .prepare(
         `SELECT s.id, s.semester, s.days, s.start_time, s.end_time, s.room, s.capacity, s.enrolled_count,
-                c.code, c.title
+                c.code, c.title,
+                CASE
+                  WHEN EXISTS (
+                    SELECT 1 FROM grades g
+                    WHERE g.section_id = s.id AND g.is_final = 1
+                  ) THEN 1 ELSE 0
+                END AS grades_submitted
          FROM sections s
          JOIN courses c ON c.id = s.course_id
          WHERE s.faculty_user_id = ? AND s.semester = ?
@@ -40,6 +46,7 @@ export async function GET(request: NextRequest) {
       enrolled_count: number
       code: string
       title: string
+      grades_submitted: number
     }[]
 
     return NextResponse.json({ semester, courses: rows })

@@ -31,9 +31,7 @@ export default function LoginContent() {
       ? 'Sign in to your PMU Faculty Account'
       : roleParam === 'student'
         ? 'Sign in to your PMU Student Account'
-        : roleParam === 'admin'
-          ? 'Sign in to your PMU Account'
-          : 'Sign in to your PMU Account'
+        : 'Sign in to your PMU Account'
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -60,35 +58,30 @@ export default function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[#f0f2f5] text-[#1e2a3a]">
-      <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col px-4 py-8 sm:px-6">
-        {/* Intro copy on light gray (not on the dark card) */}
-        <div className="mb-6 text-center">
+    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_20%_20%,#ffffff_0%,#f0f2f5_45%,#e8edf5_100%)] text-[#1e2a3a]">
+      <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-4 py-8 sm:px-6">
+        <div className="page-fade-in mb-6 text-center">
+          <img
+            src="/img/pmulogo.png"
+            alt="Prince Mohammad Bin Fahd University"
+            className="mx-auto mb-5 h-auto max-h-[80px] w-auto max-w-[260px] object-contain"
+          />
           <h1 className="text-xl font-semibold text-[#1a5fb4] sm:text-2xl">Welcome Back</h1>
           <p className="mt-2 text-sm text-[#4a5568] sm:text-base">{signInHeadline}</p>
         </div>
 
-        {/* Dark navy card: campus banner strip + Sign In form (login page only) */}
-        <div className="w-full max-w-[480px] self-center overflow-hidden rounded-xl bg-[#1e2a3a] shadow-xl">
-          <div className="w-full border-b border-white/10 bg-[#1e2a3a]">
-            <img
-              src="/img/login-banner.png"
-              alt=""
-              className="h-[72px] w-full object-cover object-left sm:h-[80px]"
-            />
-          </div>
-          <div className="p-6 sm:p-8">
+        <div className="page-fade-in w-full max-w-[480px] self-center rounded-xl bg-[#1e2a3a] p-6 shadow-xl sm:p-8">
             <div className="mb-6 text-center">
               <h2 className="text-lg font-semibold text-white">Sign In</h2>
               <p className="mt-1 text-sm text-white/70">Use your PMU Email ID without @pmu.edu.sa</p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
+            {error ? (
               <Alert variant="destructive" className="border-red-400/50 bg-red-950/50 text-white">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
-            )}
+            ) : null}
 
             <div className="space-y-2">
               <Label htmlFor="email" className="text-sm font-medium text-white/90">
@@ -147,7 +140,7 @@ export default function LoginContent() {
                 'Sign In'
               )}
             </Button>
-            </form>
+          </form>
 
             <div className="mt-6 border-t border-white/10 pt-6 text-center">
             <p className="text-sm text-white/70">
@@ -164,7 +157,6 @@ export default function LoginContent() {
                 ← Back to home
               </Link>
             </p>
-            </div>
           </div>
         </div>
       </div>

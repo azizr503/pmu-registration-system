@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import {
   Dialog,
   DialogContent,
@@ -33,7 +34,8 @@ export default function FacultyGradesPage() {
   const params = useParams()
   const sectionId = params.courseId as string
   const [rows, setRows] = useState<Row[]>([])
-  const [weights, setWeights] = useState({ mid: 0.3, fin: 0.5, asg: 0.2 })
+  const [weights, setWeights] = useState({ mid: 0.4, fin: 0.4, asg: 0.2 })
+  const [sectionMeta, setSectionMeta] = useState<{ code: string; title: string; semester: string } | null>(null)
   const [locked, setLocked] = useState(false)
   const [loading, setLoading] = useState(true)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -46,6 +48,7 @@ export default function FacultyGradesPage() {
       if (!r.ok) throw new Error(d.error)
       setRows(d.rows)
       setWeights(d.weights)
+      setSectionMeta(d.section)
       setLocked(d.locked)
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed')
@@ -70,6 +73,12 @@ export default function FacultyGradesPage() {
           : r
       )
     )
+  }
+
+  const calcGrade = (r: Row) => {
+    if (r.midterm == null || r.final == null || r.assignment == null) return null
+    const v = r.midterm * weights.mid + r.final * weights.fin + r.assignment * weights.asg
+    return Math.round(v * 100) / 100
   }
 
   const save = async (action: 'draft' | 'final') => {
@@ -108,23 +117,25 @@ export default function FacultyGradesPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl font-semibold text-[#1a5fb4]">Grade submission</h1>
-      <p className="text-sm text-muted-foreground">
+      <h1 className="text-xl font-semibold text-[#1a5fb4]">
+        Grade Submission — {sectionMeta ? `${sectionMeta.code} ${sectionMeta.title} (${sectionMeta.semester})` : sectionId}
+      </h1>
+      <p className="rounded-md bg-[#1a5fb4]/10 px-3 py-2 text-sm text-[#1a5fb4]">
         Weights: Midterm {weights.mid * 100}% · Final {weights.fin * 100}% · Assignments {weights.asg * 100}%
       </p>
-      {locked && <p className="text-sm text-amber-600">Grades are locked for this section.</p>}
+      {locked && <p className="text-sm font-medium text-emerald-700">Grades Submitted ✅</p>}
 
       <div className="overflow-x-auto rounded-lg border">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>ID</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Midterm</TableHead>
-              <TableHead>Final</TableHead>
-              <TableHead>Assignment</TableHead>
-              <TableHead>Calculated</TableHead>
-              <TableHead>Override</TableHead>
+          <TableHeader className="bg-[#1a5fb4]">
+            <TableRow className="border-[#1a5fb4] hover:bg-[#1a5fb4]">
+              <TableHead className="text-white">Student ID</TableHead>
+              <TableHead className="text-white">Student Name</TableHead>
+              <TableHead className="text-white">Midterm (%)</TableHead>
+              <TableHead className="text-white">Final (%)</TableHead>
+              <TableHead className="text-white">Assignment (%)</TableHead>
+              <TableHead className="text-white">Calculated Grade</TableHead>
+              <TableHead className="text-white">Override</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -137,6 +148,8 @@ export default function FacultyGradesPage() {
                     type="number"
                     className="w-20"
                     disabled={r.isFinal}
+                    min={0}
+                    max={100}
                     value={r.midterm ?? ''}
                     onChange={e => update(r.userId, 'midterm', e.target.value)}
                   />
@@ -146,6 +159,8 @@ export default function FacultyGradesPage() {
                     type="number"
                     className="w-20"
                     disabled={r.isFinal}
+                    min={0}
+                    max={100}
                     value={r.final ?? ''}
                     onChange={e => update(r.userId, 'final', e.target.value)}
                   />
@@ -155,18 +170,31 @@ export default function FacultyGradesPage() {
                     type="number"
                     className="w-20"
                     disabled={r.isFinal}
+                    min={0}
+                    max={100}
                     value={r.assignment ?? ''}
                     onChange={e => update(r.userId, 'assignment', e.target.value)}
                   />
                 </TableCell>
-                <TableCell>{r.calculatedGrade != null ? r.calculatedGrade.toFixed(1) : '—'}</TableCell>
+                <TableCell>{calcGrade(r) != null ? calcGrade(r)?.toFixed(1) : '—'}</TableCell>
                 <TableCell>
-                  <Input
-                    className="w-16"
+                  <Select
+                    value={r.overrideGrade || 'auto'}
                     disabled={r.isFinal}
-                    value={r.overrideGrade ?? ''}
-                    onChange={e => update(r.userId, 'overrideGrade', e.target.value)}
-                  />
+                    onValueChange={v => update(r.userId, 'overrideGrade', v === 'auto' ? '' : v)}
+                  >
+                    <SelectTrigger className="w-24">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="auto">Auto</SelectItem>
+                      {['A+', 'A', 'B+', 'B', 'C+', 'C', 'D+', 'D', 'F'].map(g => (
+                        <SelectItem key={g} value={g}>
+                          {g}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </TableCell>
               </TableRow>
             ))}
@@ -175,10 +203,10 @@ export default function FacultyGradesPage() {
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <Button variant="outline" disabled={locked} onClick={() => void save('draft')}>
+        <Button className="bg-[#1a5fb4] text-white hover:bg-[#154a96]" disabled={locked} onClick={() => void save('draft')}>
           Save Draft
         </Button>
-        <Button className="bg-[#1a5fb4]" disabled={locked} onClick={() => setConfirmOpen(true)}>
+        <Button className="bg-[#e05a00] text-white hover:bg-[#c94f00]" disabled={locked} onClick={() => setConfirmOpen(true)}>
           Submit Final Grades
         </Button>
       </div>
@@ -188,8 +216,7 @@ export default function FacultyGradesPage() {
           <DialogHeader>
             <DialogTitle>Submit final grades?</DialogTitle>
             <DialogDescription>
-              This locks the grade sheet for students in this section. In production, changes would require registrar
-              approval.
+              This action is final. Grades cannot be changed after submission.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">

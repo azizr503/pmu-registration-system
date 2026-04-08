@@ -38,6 +38,7 @@ type Section = {
   room: string | null
   capacity: number
   enrolled_count: number
+  prerequisites?: string | string[] | null
 }
 
 export default function StudentRegisterPage() {
@@ -220,24 +221,40 @@ export default function StudentRegisterPage() {
           <CardContent className="p-0">
             <ScrollArea className="h-[520px]">
               <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Code</TableHead>
-                    <TableHead>Title</TableHead>
-                    <TableHead>Credits</TableHead>
-                    <TableHead>Instructor</TableHead>
-                    <TableHead>Days</TableHead>
-                    <TableHead>Time</TableHead>
-                    <TableHead>Room</TableHead>
-                    <TableHead>Seats</TableHead>
+                <TableHeader className="bg-[#1a5fb4]">
+                  <TableRow className="border-[#1a5fb4] hover:bg-[#1a5fb4]">
+                    <TableHead className="text-white">Code</TableHead>
+                    <TableHead className="text-white">Title</TableHead>
+                    <TableHead className="text-white">Credits</TableHead>
+                    <TableHead className="text-white">Instructor</TableHead>
+                    <TableHead className="text-white">Days</TableHead>
+                    <TableHead className="text-white">Time</TableHead>
+                    <TableHead className="text-white">Room</TableHead>
+                    <TableHead className="text-white">Prerequisites</TableHead>
+                    <TableHead className="text-white">Seats</TableHead>
                     <TableHead />
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filtered.map(s => {
+                  {filtered.map((s, idx) => {
                     const seatsLeft = s.capacity - s.enrolled_count
+                    const pctFilled = Math.min(100, Math.round((s.enrolled_count / Math.max(1, s.capacity)) * 100))
+                    const prereqLabel = (() => {
+                      if (Array.isArray(s.prerequisites)) return s.prerequisites.join(', ')
+                      if (typeof s.prerequisites !== 'string' || !s.prerequisites.trim()) return 'None'
+                      const raw = s.prerequisites.trim()
+                      if (raw.startsWith('[')) {
+                        try {
+                          const arr = JSON.parse(raw) as string[]
+                          return Array.isArray(arr) && arr.length > 0 ? arr.join(', ') : 'None'
+                        } catch {
+                          return raw
+                        }
+                      }
+                      return raw
+                    })()
                     return (
-                      <TableRow key={s.id}>
+                      <TableRow key={s.id} className={idx % 2 === 0 ? 'bg-white' : 'bg-[#f8fafc]'}>
                         <TableCell className="font-mono text-sm">{s.code}</TableCell>
                         <TableCell>{s.title}</TableCell>
                         <TableCell>{s.credits}</TableCell>
@@ -247,14 +264,22 @@ export default function StudentRegisterPage() {
                           {s.start_time && s.end_time ? `${s.start_time}–${s.end_time}` : '—'}
                         </TableCell>
                         <TableCell>{s.room || '—'}</TableCell>
+                        <TableCell className="max-w-[160px] truncate text-xs text-muted-foreground">{prereqLabel}</TableCell>
                         <TableCell>
-                          {seatsLeft > 0 ? `${seatsLeft} left` : 'Full'}
+                          <div className="space-y-1">
+                            <div className="h-2 w-24 rounded-full bg-muted">
+                              <div className="h-2 rounded-full bg-[#1a5fb4]" style={{ width: `${pctFilled}%` }} />
+                            </div>
+                            <span className="text-xs text-muted-foreground">
+                              {s.enrolled_count}/{s.capacity}
+                            </span>
+                          </div>
                         </TableCell>
                         <TableCell>
                           <Button
                             size="sm"
                             disabled={seatsLeft <= 0 || adding === s.id}
-                            className="bg-[#1a5fb4]"
+                            className="h-8 bg-[#15803d] px-3 text-xs hover:bg-[#166534]"
                             onClick={() => void handleAdd(s.id)}
                           >
                             {adding === s.id ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Add'}
@@ -270,7 +295,7 @@ export default function StudentRegisterPage() {
         </Card>
       </div>
 
-      <Card className="h-fit xl:sticky xl:top-4">
+      <Card className="h-fit border border-[#1a5fb4]/20 shadow-md xl:sticky xl:top-4">
         <CardHeader>
           <CardTitle>My Cart</CardTitle>
         </CardHeader>
@@ -301,7 +326,9 @@ export default function StudentRegisterPage() {
                 <p className="text-sm text-amber-600">Warning: you are over the credit limit.</p>
               )}
               <Button
-                className="w-full bg-[#1a5fb4]"
+                className={`w-full ${
+                  cart.items.length > 0 ? 'bg-[#e05a00] text-white hover:bg-[#c94f00]' : 'bg-muted text-muted-foreground'
+                }`}
                 disabled={!cartConflictFree || cart.items.length === 0}
                 onClick={() => void handleConfirm()}
               >
