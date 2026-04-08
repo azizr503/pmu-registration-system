@@ -13,7 +13,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { getStudentGrades } from '@/lib/api/student'
-import { gradeColorClass } from '@/lib/grade-utils'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -54,6 +53,31 @@ export default function StudentGradesPage() {
   const letter = (r: { letter_grade: string | null; override_grade: string | null }) =>
     r.override_grade || r.letter_grade || '—'
 
+  const gradePoints = (grade: string) => {
+    const g = grade.toUpperCase()
+    const map: Record<string, number> = {
+      'A+': 4.0,
+      A: 4.0,
+      'A-': 3.7,
+      'B+': 3.3,
+      B: 3.0,
+      'B-': 2.7,
+      'C+': 2.3,
+      C: 2.0,
+      'C-': 1.7,
+      D: 1.0,
+      F: 0,
+    }
+    return map[g] ?? 0
+  }
+
+  const gradeBadgeClass = (grade: string) => {
+    if (grade.startsWith('A')) return 'bg-emerald-100 text-emerald-700'
+    if (grade.startsWith('B')) return 'bg-blue-100 text-blue-700'
+    if (grade.startsWith('C')) return 'bg-amber-100 text-amber-700'
+    return 'bg-red-100 text-red-700'
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -63,7 +87,7 @@ export default function StudentGradesPage() {
             Cumulative GPA: <strong>{cumulativeGpa.toFixed(2)}</strong>
           </p>
         </div>
-        <Button className="bg-[#1a5fb4]" onClick={() => setOpen(true)}>
+        <Button className="bg-[#e05a00] text-white hover:bg-[#c94f00]" onClick={() => setOpen(true)}>
           Request Official Transcript
         </Button>
       </div>
@@ -73,11 +97,13 @@ export default function StudentGradesPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Credits completed: <strong>{creditsCompleted}</strong> / {creditsRequired} required
         </p>
-        <div className="mt-2 h-2 w-full max-w-md rounded-full bg-muted">
+        <div className="mt-2 h-4 w-full max-w-md rounded-full bg-muted">
           <div
-            className="h-2 rounded-full bg-[#1a5fb4]"
+            className="flex h-4 items-center justify-end rounded-full bg-[#1a5fb4] pr-2 text-[10px] font-medium text-white"
             style={{ width: `${Math.min(100, (creditsCompleted / creditsRequired) * 100)}%` }}
-          />
+          >
+            {Math.min(100, Math.round((creditsCompleted / creditsRequired) * 100))}%
+          </div>
         </div>
       </div>
 
@@ -107,7 +133,7 @@ export default function StudentGradesPage() {
                   <TableHead>Course</TableHead>
                   <TableHead>Credits</TableHead>
                   <TableHead>Grade</TableHead>
-                  <TableHead>Points</TableHead>
+                  <TableHead>Grade Points</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -118,12 +144,28 @@ export default function StudentGradesPage() {
                       <TableCell className="font-mono">{r.code}</TableCell>
                       <TableCell>{r.title}</TableCell>
                       <TableCell>{r.credits}</TableCell>
-                      <TableCell className={gradeColorClass(letter(r))}>{letter(r)}</TableCell>
-                      <TableCell>—</TableCell>
+                      <TableCell>
+                        <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${gradeBadgeClass(letter(r))}`}>
+                          {letter(r)}
+                        </span>
+                      </TableCell>
+                      <TableCell>{gradePoints(letter(r)).toFixed(1)}</TableCell>
                     </TableRow>
                   ))}
               </TableBody>
             </Table>
+            <p className="mt-3 text-sm text-muted-foreground">
+              Semester GPA:{' '}
+              <strong className="text-[#1a5fb4]">
+                {(() => {
+                  const semRows = rows.filter(r => r.semester === sem)
+                  const totalCredits = semRows.reduce((sum, r) => sum + r.credits, 0)
+                  if (totalCredits === 0) return '0.00'
+                  const weighted = semRows.reduce((sum, r) => sum + gradePoints(letter(r)) * r.credits, 0)
+                  return (weighted / totalCredits).toFixed(2)
+                })()}
+              </strong>
+            </p>
           </TabsContent>
         )))}
       </Tabs>

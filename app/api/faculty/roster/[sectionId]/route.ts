@@ -15,8 +15,21 @@ export async function GET(
     const { sectionId } = await context.params
     const db = getDb()
     const sec = db
-      .prepare(`SELECT id, faculty_user_id FROM sections WHERE id = ?`)
-      .get(sectionId) as { id: string; faculty_user_id: string | null } | undefined
+      .prepare(
+        `SELECT s.id, s.faculty_user_id, s.semester, c.code, c.title
+         FROM sections s
+         JOIN courses c ON c.id = s.course_id
+         WHERE s.id = ?`
+      )
+      .get(sectionId) as
+      | {
+          id: string
+          faculty_user_id: string | null
+          semester: string
+          code: string
+          title: string
+        }
+      | undefined
     if (!sec || sec.faculty_user_id !== user.id) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 })
     }
@@ -53,6 +66,12 @@ export async function GET(
       : rows
 
     return NextResponse.json({
+      section: {
+        id: sec.id,
+        code: sec.code,
+        title: sec.title,
+        semester: sec.semester,
+      },
       students: filtered.map(r => ({
         studentId: r.student_id,
         name: r.full_name,

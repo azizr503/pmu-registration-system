@@ -106,27 +106,31 @@ export default function StudentSchedulePage() {
 
       <div className="overflow-x-auto rounded-lg border border-border bg-white">
         <div className="relative min-w-[900px]">
-          <div className="grid grid-cols-[80px_repeat(5,1fr)] border-b text-xs font-medium text-muted-foreground">
+          <div className="grid grid-cols-[80px_repeat(5,1fr)] border-b bg-[#f8fafc] text-xs font-medium text-muted-foreground">
             <div className="p-2">Time</div>
             {DAYS.map(d => (
-              <div key={d} className="border-l p-2 text-center">
+              <div key={d} className="border-l border-border p-2 text-center">
                 {d}
               </div>
             ))}
           </div>
           <div className="grid grid-cols-[80px_repeat(5,1fr)]" style={{ minHeight: 560 }}>
-            <div className="relative border-r text-[10px] text-muted-foreground">
+            <div className="relative border-r border-border text-[10px] text-muted-foreground">
               {Array.from({ length: END_H - START_H }).map((_, i) => {
                 const h = START_H + i
                 return (
-                  <div key={h} className="absolute w-full text-right pr-1" style={{ top: `${(i / (END_H - START_H)) * 100}%` }}>
+                  <div
+                    key={h}
+                    className="absolute w-full border-t border-border/70 pr-1 text-right"
+                    style={{ top: `${(i / (END_H - START_H)) * 100}%` }}
+                  >
                     {h}:00
                   </div>
                 )
               })}
             </div>
             {DAYS.map((day, di) => (
-              <div key={day} className="relative border-l border-border/60 bg-muted/20">
+              <div key={day} className="relative border-l border-border/80 bg-[#fcfdff]">
                 {data.sections.map((s, idx) => {
                   const ds = parseDaySet(s.days)
                   if (!ds.has(day)) return null
@@ -136,15 +140,17 @@ export default function StudentSchedulePage() {
                     <div
                       key={`${s.id}-${day}`}
                       title={`${s.course_title} — ${s.instructor_name || ''}`}
-                      className="absolute left-1 right-1 overflow-hidden rounded px-1 py-0.5 text-[10px] text-white shadow-sm sm:text-xs"
+                      className="absolute left-1 right-1 overflow-hidden rounded-lg px-1.5 py-1 text-[10px] text-white shadow-sm sm:text-xs"
                       style={{
                         ...st,
                         backgroundColor: conflict ? '#dc2626' : colors[idx % colors.length],
                         zIndex: 2,
                       }}
                     >
-                      <span className="font-semibold">{s.course_code}</span>
-                      <span className="block opacity-90">{s.room}</span>
+                      <span className="block font-semibold">{s.course_code}</span>
+                      <span className="block truncate text-[10px] opacity-95">{s.course_title}</span>
+                      <span className="block truncate text-[10px] opacity-90">{s.instructor_name || 'TBA'}</span>
+                      <span className="block text-[10px] opacity-90">{s.room}</span>
                       {conflict && <span className="text-[10px]">⚠️</span>}
                     </div>
                   )
@@ -152,6 +158,21 @@ export default function StudentSchedulePage() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+      <div className="rounded-lg border border-border bg-white p-3">
+        <p className="mb-2 text-sm font-medium text-[#1a5fb4]">Legend</p>
+        <div className="flex flex-wrap gap-2">
+          {data.sections.map((s, idx) => (
+            <span
+              key={`legend-${s.id}`}
+              className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-xs text-white"
+              style={{ backgroundColor: colors[idx % colors.length] }}
+            >
+              <span className="font-semibold">{s.course_code}</span>
+              <span>{s.course_title}</span>
+            </span>
+          ))}
         </div>
       </div>
     </div>

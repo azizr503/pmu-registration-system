@@ -5,4 +5,5 @@ export const ADMIN_NAV: PortalNavItem[] = [
   { href: '/admin/users', label: '👥 Users' },
   { href: '/admin/courses', label: '📚 Courses' },
   { href: '/admin/registration-control', label: '⚙️ Registration' },
+  { href: '/admin/ai-assistant', label: '🤖 AI Assistant', badge: 'NEW' },
 ]

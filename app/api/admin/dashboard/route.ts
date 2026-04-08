@@ -17,12 +17,27 @@ export async function GET(request: NextRequest) {
       .get() as { c: number }
     const openCourses = db.prepare(`SELECT COUNT(*) as c FROM sections`).get() as { c: number }
 
+    const settings = db.prepare(`SELECT semester, is_open, start_date, end_date FROM registration_settings WHERE id = 1`).get() as
+      | {
+          semester: string | null
+          is_open: number
+          start_date: string | null
+          end_date: string | null
+        }
+      | undefined
+
     return NextResponse.json({
       stats: {
         totalStudents: students.c,
         totalFaculty: faculty.c,
         activeRegistrations: activeRegs.c,
         openCourses: openCourses.c,
+      },
+      registration: {
+        semester: settings?.semester || 'Spring 2026',
+        isOpen: Boolean(settings?.is_open ?? 1),
+        startDate: settings?.start_date || '2026-01-15',
+        endDate: settings?.end_date || '2026-02-15',
       },
     })
   } catch (e) {

@@ -10,19 +10,18 @@ import { toast } from 'sonner'
 type Msg = { role: 'user' | 'assistant'; content: string }
 
 const CHIPS = [
-  'Register me for Operating Systems',
-  'Do I have any conflicts?',
-  'What courses can I take this semester?',
-  'Check my prerequisites for CS401',
-  'Show me sections with no time conflicts',
+  'Registration summary',
+  'Low enrollment courses',
+  'Inactive users',
+  'Export student list',
 ]
 
-export default function StudentChatbotPage() {
+export default function AdminAiAssistantPage() {
   const [messages, setMessages] = useState<Msg[]>([
     {
       role: 'assistant',
       content:
-        'Hi! I am the PMU Registration Assistant. I can help using your real registration and grade data when available.',
+        'Hello — I am the PMU Admin Assistant. I can answer questions using live registration and enrollment data for the current semester.',
     },
   ])
   const [input, setInput] = useState('')
@@ -42,7 +41,7 @@ export default function StudentChatbotPage() {
     setMessages(next)
     setLoading(true)
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch('/api/admin/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: next }),
@@ -60,7 +59,9 @@ export default function StudentChatbotPage() {
   }
 
   return (
-    <div className="mx-auto flex max-w-4xl flex-col gap-4" style={{ minHeight: '78vh' }}>
+    <div className="page-fade-in mx-auto flex max-w-4xl flex-col gap-4" style={{ minHeight: '78vh' }}>
+      <h1 className="text-xl font-semibold text-[#1a5fb4]">Admin AI Assistant</h1>
+
       <div className="flex flex-wrap gap-2">
         {CHIPS.map(c => (
           <Button
@@ -76,11 +77,11 @@ export default function StudentChatbotPage() {
       </div>
 
       <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
-        <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <img src="/img/pmulogo.png" alt="PMU" className="h-9 w-9 rounded-full border border-border object-contain" />
+        <div className="flex items-center gap-3 border-b border-border bg-[#0f2a52] px-4 py-3">
+          <img src="/img/pmulogo.png" alt="PMU" className="h-9 w-9 rounded-full border border-white/20 object-contain" />
           <div>
-            <p className="font-semibold text-[#1a5fb4]">PMU AI Assistant</p>
-            <p className="text-xs text-muted-foreground">Registration & academic help</p>
+            <p className="font-semibold text-white">PMU Admin AI</p>
+            <p className="text-xs text-white/70">Registration analytics & reports</p>
           </div>
         </div>
         <ScrollArea
@@ -96,9 +97,7 @@ export default function StudentChatbotPage() {
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
-                    m.role === 'user'
-                      ? 'bg-[#1a5fb4] text-white'
-                      : 'bg-muted text-foreground'
+                    m.role === 'user' ? 'bg-[#1a5fb4] text-white' : 'bg-muted text-foreground'
                   }`}
                 >
                   <p className="whitespace-pre-wrap">{m.content}</p>
@@ -128,7 +127,7 @@ export default function StudentChatbotPage() {
           <Input
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Ask about registration, conflicts, prerequisites…"
+            placeholder="Ask about registration stats, low enrollment, inactive users…"
             className="flex-1"
           />
           <Button type="submit" className="bg-[#e05a00] text-white hover:bg-[#c94f00]" disabled={loading}>
