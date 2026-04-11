@@ -25,6 +25,7 @@ import {
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { toast } from 'sonner'
 import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 type Course = {
   id: string
@@ -52,7 +53,7 @@ export default function AdminCoursesPage() {
   })
 
   const load = async () => {
-    const r = await fetch('/api/admin/courses')
+    const r = await fetch(apiUrl('/admin/courses'), { credentials: 'include' })
     const d = await r.json()
     if (r.ok) {
       setCourses(d.courses as Course[])
@@ -117,9 +118,10 @@ export default function AdminCoursesPage() {
         .map(s => s.trim())
         .filter(Boolean)
       if (editingId) {
-        const r = await fetch(`/api/admin/courses/${editingId}`, {
+        const r = await fetch(apiUrl(`/admin/courses/${editingId}`), {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             code: courseForm.code,
             title: courseForm.title,
@@ -132,9 +134,10 @@ export default function AdminCoursesPage() {
         if (!r.ok) throw new Error(d.error)
         toast.success('Course updated')
       } else {
-        const r = await fetch('/api/admin/courses', {
+        const r = await fetch(apiUrl('/admin/courses'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({
             kind: 'course',
             code: courseForm.code,
@@ -158,7 +161,10 @@ export default function AdminCoursesPage() {
   const deleteCourse = async () => {
     if (!deleteId) return
     try {
-      const r = await fetch(`/api/admin/courses/${deleteId}`, { method: 'DELETE' })
+      const r = await fetch(apiUrl(`/admin/courses/${deleteId}`), {
+        method: 'DELETE',
+        credentials: 'include',
+      })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error)
       toast.success('Course deleted')

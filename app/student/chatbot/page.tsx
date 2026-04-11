@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { PmuLogo } from '@/components/pmu-logo'
 import { chatApiErrorMessage, readChatStream } from '@/lib/chat-stream-client'
 import { ChatMessageBody } from '@/components/chat-message-body'
+import { apiUrl } from '@/lib/api-base'
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
@@ -45,9 +46,10 @@ export default function StudentChatbotPage() {
     setMessages(next)
     setLoading(true)
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch(apiUrl('/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ messages: next }),
       })
       if (!res.ok) {

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { putStudentProfile } from '@/lib/api/student'
+import { apiUrl } from '@/lib/api-base'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import { Camera, Loader2 } from 'lucide-react'
@@ -36,7 +37,7 @@ export default function StudentProfilePage() {
   useEffect(() => {
     void (async () => {
       try {
-        const r = await fetch('/api/student/profile')
+        const r = await fetch(apiUrl('/student/profile'), { credentials: 'include' })
         const d = await r.json()
         if (!r.ok) throw new Error(d.error)
         const p = d.profile as Record<string, string | number>

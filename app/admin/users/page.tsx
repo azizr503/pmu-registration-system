@@ -7,6 +7,15 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -16,9 +25,18 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import { toast } from 'sonner'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/lib/auth-context'
+import { apiUrl } from '@/lib/api-base'
 
 type U = {
   id: string
@@ -43,22 +61,45 @@ function roleBadge(role: string) {
   return <Badge className="bg-purple-600 text-white hover:bg-purple-600">Admin</Badge>
 }
 
+const ADD_USER_DEFAULT = {
+  full_name: '',
+  email: '',
+  password: '',
+  role: 'student' as 'student' | 'faculty' | 'admin',
+  status: 'active' as 'active' | 'inactive',
+}
+
+function generateClientPassword(length = 14): string {
+  const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  const arr = new Uint8Array(length)
+  crypto.getRandomValues(arr)
+  let s = ''
+  for (let i = 0; i < length; i++) s += chars[arr[i]! % chars.length]
+  return s
+}
+
 export default function AdminUsersPage() {
+  const { user: authUser } = useAuth()
   const [users, setUsers] = useState<U[]>([])
   const [loading, setLoading] = useState(true)
   const [selected, setSelected] = useState<Record<string, boolean>>({})
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('students')
   const [open, setOpen] = useState(false)
-  const [form, setForm] = useState({
-    email: '',
-    password: '',
-    full_name: '',
-    role: 'student' as 'student' | 'faculty' | 'admin',
-  })
+  const [form, setForm] = useState(ADD_USER_DEFAULT)
+  const [deleteTarget, setDeleteTarget] = useState<U | null>(null)
+  const [deleting, setDeleting] = useState(false)
+
+  const adminCount = useMemo(() => users.filter(u => u.role === 'admin').length, [users])
+
+  const canDeleteUser = (u: U) => {
+    if (authUser?.id && u.id === authUser.id) return false
+    if (u.role === 'admin' && adminCount <= 1) return false
+    return true
+  }
 
   const load = async () => {
-    const r = await fetch('/api/admin/users')
+    const r = await fetch(apiUrl('/admin/users'), { credentials: 'include' })
     const d = await r.json()
     if (!r.ok) throw new Error(d.error)
     setUsers(d.users)
@@ -87,8 +128,9 @@ export default function AdminUsersPage() {
 
   const toggle = async (id: string, status: 'active' | 'inactive') => {
     try {
-      const r = await fetch(`/api/admin/users/${id}`, {
+      const r = await fetch(apiUrl(`/admin/users/${id}`), {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
@@ -114,18 +156,67 @@ export default function AdminUsersPage() {
 
   const addUser = async () => {
     try {
-      const r = await fetch('/api/admin/users', {
+      const r = await fetch(apiUrl('/admin/users'), {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          email: form.email.trim(),
+          password: form.password,
+          full_name: form.full_name.trim(),
+          role: form.role,
+          status: form.status,
+        }),
       })
       const d = await r.json()
-      if (!r.ok) throw new Error(d.error)
-      toast.success('User created')
+      if (r.status === 409) {
+        toast.error('Email already in use')
+        return
+      }
+      if (!r.ok) {
+        toast.error(typeof d.error === 'string' ? d.error : 'Could not add user')
+        return
+      }
+      toast.success('User added successfully')
+      if (d.temporaryPassword && typeof d.temporaryPassword === 'string') {
+        toast.message('Temporary password', {
+          description: d.temporaryPassword,
+          duration: 20000,
+        })
+      }
+      setForm(ADD_USER_DEFAULT)
       setOpen(false)
       await load()
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Failed')
+    }
+  }
+
+  const confirmDeleteUser = async () => {
+    if (!deleteTarget) return
+    setDeleting(true)
+    try {
+      const r = await fetch(apiUrl(`/admin/users/${deleteTarget.id}`), {
+        method: 'DELETE',
+        credentials: 'include',
+      })
+      const d = await r.json().catch(() => ({}))
+      if (!r.ok) {
+        toast.error(typeof d.error === 'string' ? d.error : 'Could not delete user')
+        return
+      }
+      toast.success('User deleted successfully')
+      setDeleteTarget(null)
+      setSelected(s => {
+        const next = { ...s }
+        delete next[deleteTarget.id]
+        return next
+      })
+      await load()
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Could not delete user')
+    } finally {
+      setDeleting(false)
     }
   }
 
@@ -150,6 +241,7 @@ export default function AdminUsersPage() {
             <TableHead className="text-white">Role</TableHead>
             <TableHead className="text-white">Status</TableHead>
             <TableHead className="text-white">Last login</TableHead>
+            <TableHead className="w-[100px] text-white text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -166,7 +258,7 @@ export default function AdminUsersPage() {
               <TableCell>{u.email}</TableCell>
               <TableCell>{roleBadge(u.role)}</TableCell>
               <TableCell>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <Switch
                     checked={u.status === 'active'}
                     onCheckedChange={c => void toggle(u.id, c ? 'active' : 'inactive')}
@@ -182,6 +274,22 @@ export default function AdminUsersPage() {
                 </div>
               </TableCell>
               <TableCell className="text-sm text-muted-foreground">{formatLastLogin(u.lastLogin)}</TableCell>
+              <TableCell className="text-right">
+                {canDeleteUser(u) ? (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40"
+                    aria-label={`Delete ${u.name}`}
+                    onClick={() => setDeleteTarget(u)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                ) : (
+                  <span className="text-xs text-muted-foreground">—</span>
+                )}
+              </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -208,7 +316,13 @@ export default function AdminUsersPage() {
           <Button variant="outline" className="border-red-500 text-red-600" onClick={() => void bulk('inactive')}>
             Bulk deactivate
           </Button>
-          <Button className="bg-[#e05a00] text-white hover:bg-[#c94f00]" onClick={() => setOpen(true)}>
+          <Button
+            className="bg-[#e05a00] text-white hover:bg-[#c94f00]"
+            onClick={() => {
+              setForm(ADD_USER_DEFAULT)
+              setOpen(true)
+            }}
+          >
             Add User
           </Button>
         </div>
@@ -244,39 +358,119 @@ export default function AdminUsersPage() {
         </TabsContent>
       </Tabs>
 
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+      <AlertDialog
+        open={!!deleteTarget}
+        onOpenChange={openDlg => {
+          if (!openDlg) setDeleteTarget(null)
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete user</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {deleteTarget ? <strong>{deleteTarget.name}</strong> : 'this user'}? This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="border-border bg-muted text-muted-foreground hover:bg-muted/80">
+              Cancel
+            </AlertDialogCancel>
+            <Button
+              type="button"
+              disabled={deleting}
+              className="bg-red-600 text-white hover:bg-red-700"
+              onClick={() => void confirmDeleteUser()}
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Delete'}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <Dialog
+        open={open}
+        onOpenChange={v => {
+          setOpen(v)
+          if (v) setForm(ADD_USER_DEFAULT)
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add user</DialogTitle>
           </DialogHeader>
           <div className="grid gap-3 py-2">
             <div className="space-y-1">
-              <Label>Email</Label>
-              <Input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} />
-            </div>
-            <div className="space-y-1">
-              <Label>Password</Label>
+              <Label htmlFor="add-full-name">Full name</Label>
               <Input
-                type="password"
-                value={form.password}
-                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                id="add-full-name"
+                value={form.full_name}
+                onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))}
+                placeholder="e.g. Ali Al-Mutairi"
               />
             </div>
             <div className="space-y-1">
-              <Label>Full name</Label>
-              <Input value={form.full_name} onChange={e => setForm(f => ({ ...f, full_name: e.target.value }))} />
+              <Label htmlFor="add-email">Email (@pmu.edu.sa)</Label>
+              <Input
+                id="add-email"
+                type="email"
+                value={form.email}
+                onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                placeholder="s.202099999@pmu.edu.sa"
+                autoComplete="off"
+              />
+              <p className="text-xs text-muted-foreground">
+                Students: <span className="font-mono">s.XXXXXXX@pmu.edu.sa</span> · Faculty:{' '}
+                <span className="font-mono">f.XXXXXXX@pmu.edu.sa</span> · Admin: often{' '}
+                <span className="font-mono">admin@pmu.edu.sa</span> or any @pmu.edu.sa for new admins
+              </p>
+            </div>
+            <div className="space-y-1">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <Label htmlFor="add-password">Password</Label>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-xs"
+                  onClick={() => setForm(f => ({ ...f, password: generateClientPassword() }))}
+                >
+                  Generate password
+                </Button>
+              </div>
+              <Input
+                id="add-password"
+                type="text"
+                value={form.password}
+                onChange={e => setForm(f => ({ ...f, password: e.target.value }))}
+                placeholder="Leave blank to auto-generate on save (min. 8 chars if you type one)"
+                autoComplete="new-password"
+              />
             </div>
             <div className="space-y-1">
               <Label>Role</Label>
-              <select
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={form.role}
-                onChange={e => setForm(f => ({ ...f, role: e.target.value as typeof f.role }))}
-              >
-                <option value="student">student</option>
-                <option value="faculty">faculty</option>
-                <option value="admin">admin</option>
-              </select>
+              <Select value={form.role} onValueChange={v => setForm(f => ({ ...f, role: v as typeof f.role }))}>
+                <SelectTrigger className="w-full min-w-0">
+                  <SelectValue placeholder="Role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="student">Student</SelectItem>
+                  <SelectItem value="faculty">Faculty</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1">
+              <Label>Status</Label>
+              <Select value={form.status} onValueChange={v => setForm(f => ({ ...f, status: v as typeof f.status }))}>
+                <SelectTrigger className="w-full min-w-0">
+                  <SelectValue placeholder="Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <DialogFooter>
@@ -284,7 +478,7 @@ export default function AdminUsersPage() {
               Cancel
             </Button>
             <Button className="bg-[#e05a00] text-white hover:bg-[#c94f00]" onClick={() => void addUser()}>
-              Create
+              Create user
             </Button>
           </DialogFooter>
         </DialogContent>

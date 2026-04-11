@@ -1,14 +1,17 @@
+import { apiUrl } from '@/lib/api-base'
+
 type ChatMessage = {
   role: 'user' | 'assistant'
   content: string
 }
 
-/** Reads the streaming text/plain body from POST /api/chat (same contract as the student chatbot page). */
+/** Reads the streaming text/plain body from POST /chat. */
 export async function sendChatMessageApi(messages: ChatMessage[]): Promise<{ message: string }> {
-  const response = await fetch('/api/chat', {
+  const response = await fetch(apiUrl('/chat'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ messages }),
+    credentials: 'include',
   })
 
   if (!response.ok) {

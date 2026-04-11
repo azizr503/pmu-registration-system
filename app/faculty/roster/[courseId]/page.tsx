@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from '
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 export default function FacultyRosterPage() {
   const params = useParams()
@@ -32,9 +33,9 @@ export default function FacultyRosterPage() {
   const load = async (search?: string) => {
     setLoading(true)
     try {
-      const u = new URL(`/api/faculty/roster/${sectionId}`, window.location.origin)
+      const u = new URL(apiUrl(`/faculty/roster/${sectionId}`))
       if (search) u.searchParams.set('q', search)
-      const r = await fetch(u.toString())
+      const r = await fetch(u.toString(), { credentials: 'include' })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error)
       setSectionMeta(d.section)

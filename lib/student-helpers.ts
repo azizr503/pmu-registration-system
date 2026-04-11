@@ -2,7 +2,9 @@ import type { Database } from 'better-sqlite3'
 import { sectionsTimeConflict, type SectionTimeFields } from '@/lib/schedule-utils'
 
 export function getRegistrationSettings(db: Database) {
-  return db.prepare('SELECT semester, is_open, max_credits FROM registration_settings WHERE id = 1').get() as
+  return db
+    .prepare('SELECT semester_label AS semester, is_open, max_credits FROM registration_settings WHERE id = 1')
+    .get() as
     | { semester: string | null; is_open: number; max_credits: number }
     | undefined
 }
@@ -14,7 +16,7 @@ export function getCompletedCourseCodes(db: Database, userId: string): Set<strin
        FROM grades g
        JOIN sections s ON s.id = g.section_id
        JOIN courses c ON c.id = s.course_id
-       WHERE g.user_id = ? AND g.is_final = 1`
+       WHERE g.student_id = ? AND g.is_final = 1`
     )
     .all(userId) as { code: string; letter_grade: string | null }[]
 
@@ -59,7 +61,7 @@ export function getSectionRow(db: Database, sectionId: string) {
               f.full_name AS instructor_name
        FROM sections s
        JOIN courses c ON c.id = s.course_id
-       LEFT JOIN faculty f ON f.user_id = s.faculty_user_id
+       LEFT JOIN faculty f ON f.user_id = s.faculty_id
        WHERE s.id = ?`
     )
     .get(sectionId) as
@@ -87,8 +89,8 @@ export function listStudentSectionsForSemester(db: Database, userId: string, sem
        FROM registrations r
        JOIN sections s ON s.id = r.section_id
        JOIN courses c ON c.id = s.course_id
-       LEFT JOIN faculty f ON f.user_id = s.faculty_user_id
-       WHERE r.user_id = ? AND r.semester = ? AND r.status IN (${placeholders})`
+       LEFT JOIN faculty f ON f.user_id = s.faculty_id
+       WHERE r.student_id = ? AND r.semester = ? AND r.status IN (${placeholders})`
     )
     .all(userId, semester, ...statuses) as (SectionTimeFields & {
     id: string

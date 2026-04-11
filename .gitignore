@@ -26,5 +26,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# local SQLite database
-/data/
+# local SQLite database (schema + seed JSON are committed)
+/data/pmu.db
+/data/pmu.db-wal
+/data/pmu.db-shm

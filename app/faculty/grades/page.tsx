@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Loader2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 type CourseRow = {
   id: string
@@ -23,7 +24,7 @@ export default function FacultyGradesStatusPage() {
   useEffect(() => {
     void (async () => {
       try {
-        const r = await fetch('/api/faculty/courses')
+        const r = await fetch(apiUrl('/faculty/courses'), { credentials: 'include' })
         const d = await r.json()
         if (!r.ok) throw new Error(d.error)
         setSemester(d.semester)

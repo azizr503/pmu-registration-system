@@ -1,6 +1,14 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  serverExternalPackages: ['better-sqlite3', 'bcrypt'],
+  async rewrites() {
+    return [
+      {
+        source: '/__pmu_backend/:path*',
+        destination: 'http://127.0.0.1:5001/:path*',
+      },
+    ]
+  },
+  serverExternalPackages: [],
   eslint: {
     ignoreDuringBuilds: true,
   },
