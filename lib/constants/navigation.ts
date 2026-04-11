@@ -13,7 +13,7 @@ export function getPostLoginPath(user: AuthUser, requestedRedirect?: string | nu
   if (requestedRedirect && requestedRedirect !== '/' && !requestedRedirect.startsWith('/login')) {
     return requestedRedirect
   }
-  if (user.role === 'student' && !user.profileCompleted) {
+  if (user.role === 'student' && user.profileCompleted !== true) {
     return '/student/profile-setup'
   }
   return roleHomePath(user.role)

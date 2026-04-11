@@ -1,5 +1,5 @@
 /**
- * One-time / CI: apply backend/db/schema.sql and import data/users.json + data/courses.json
+ * One-time / CI: apply backend/db/schema.sql and import data/users.json + backend/db/pmu-course-catalog.json
  * when tables are empty. Safe to re-run (skips if users already exist).
  *
  * Usage: npm run db:migrate
@@ -12,7 +12,7 @@ const root = path.join(__dirname, '..')
 const dbPath = path.join(root, 'data', 'pmu.db')
 const schemaPath = path.join(root, 'backend', 'db', 'schema.sql')
 const usersPath = path.join(root, 'data', 'users.json')
-const coursesPath = path.join(root, 'data', 'courses.json')
+const catalogPath = path.join(root, 'backend', 'db', 'pmu-course-catalog.json')
 
 fs.mkdirSync(path.dirname(dbPath), { recursive: true })
 
@@ -30,7 +30,7 @@ if (userCount > 0) {
 }
 
 const usersDoc = JSON.parse(fs.readFileSync(usersPath, 'utf8'))
-const coursesDoc = JSON.parse(fs.readFileSync(coursesPath, 'utf8'))
+const catalogCourses = JSON.parse(fs.readFileSync(catalogPath, 'utf8'))
 
 const insertUser = db.prepare(`
   INSERT INTO users (id, email, password_hash, role, status, created_at, last_login)
@@ -93,15 +93,15 @@ const tx = db.transaction(() => {
       courses_history: f.courses_history ?? '[]',
     })
   }
-  for (const c of coursesDoc.courses || []) {
+  for (const c of catalogCourses) {
     insertCourse.run({
-      id: c.id,
+      id: `c-${c.code}`,
       code: c.code,
       title: c.title,
       credits: c.credits ?? 3,
-      department: c.department ?? 'Computer Science',
-      description: c.description ?? '',
-      prerequisites: typeof c.prerequisites === 'string' ? c.prerequisites : JSON.stringify(c.prerequisites || []),
+      department: c.department ?? '',
+      description: '',
+      prerequisites: JSON.stringify(c.prerequisites || []),
     })
   }
 })
@@ -116,6 +116,6 @@ if (sectionsAfter === 0 && fs.existsSync(demoAcademicPath)) {
 }
 
 console.log(
-  `Imported ${usersDoc.users.length} users, ${(usersDoc.students || []).length} students, ${(usersDoc.faculty || []).length} faculty, ${(coursesDoc.courses || []).length} courses.`
+  `Imported ${usersDoc.users.length} users, ${(usersDoc.students || []).length} students, ${(usersDoc.faculty || []).length} faculty, ${catalogCourses.length} courses.`
 )
 db.close()

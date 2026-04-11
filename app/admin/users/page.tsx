@@ -61,12 +61,87 @@ function roleBadge(role: string) {
   return <Badge className="bg-purple-600 text-white hover:bg-purple-600">Admin</Badge>
 }
 
-const ADD_USER_DEFAULT = {
-  full_name: '',
-  email: '',
-  password: '',
-  role: 'student' as 'student' | 'faculty' | 'admin',
-  status: 'active' as 'active' | 'inactive',
+const MAJOR_OPTIONS = [
+  'Computer Science',
+  'Computer Engineering',
+  'Software Engineering',
+  'Information Technology',
+  'Artificial Intelligence',
+  'Cybersecurity',
+] as const
+
+const LEVEL_OPTIONS = ['Freshman', 'Sophomore', 'Junior', 'Senior'] as const
+
+const FACULTY_DEPARTMENTS = [
+  'Computer Science',
+  'Computer Engineering',
+  'Software Engineering',
+  'Information Technology',
+  'Artificial Intelligence',
+  'Cybersecurity',
+  'Mathematics',
+  'Physics',
+  'English',
+] as const
+
+type AddUserFormState = {
+  full_name: string
+  email: string
+  password: string
+  role: 'student' | 'faculty' | 'admin'
+  status: 'active' | 'inactive'
+  student_id: string
+  major: string
+  level: string
+  gpa: string
+  credits_completed: string
+  phone: string
+  emergency_contact: string
+  faculty_id: string
+  department: string
+  office_location: string
+  office_hours: string
+}
+
+function randomDigits(len: number) {
+  let s = ''
+  const arr = new Uint8Array(len)
+  crypto.getRandomValues(arr)
+  for (let i = 0; i < len; i++) s += String(arr[i]! % 10)
+  return s
+}
+
+function newStudentPair() {
+  const id = randomDigits(7)
+  return { student_id: `s.${id}`, email: `s.${id}@pmu.edu.sa` }
+}
+
+function newFacultyPair() {
+  const id = randomDigits(6)
+  return { faculty_id: `f.${id}`, email: `f.${id}@pmu.edu.sa` }
+}
+
+function buildAddUserForm(role: AddUserFormState['role'] = 'student'): AddUserFormState {
+  const sp = newStudentPair()
+  const fp = newFacultyPair()
+  return {
+    full_name: '',
+    email: role === 'faculty' ? fp.email : role === 'admin' ? '' : sp.email,
+    password: '',
+    role,
+    status: 'active',
+    student_id: sp.student_id,
+    major: 'Computer Science',
+    level: 'Freshman',
+    gpa: '0.00',
+    credits_completed: '0',
+    phone: '',
+    emergency_contact: '',
+    faculty_id: fp.faculty_id,
+    department: 'Computer Science',
+    office_location: '',
+    office_hours: '',
+  }
 }
 
 function generateClientPassword(length = 14): string {
@@ -86,7 +161,7 @@ export default function AdminUsersPage() {
   const [search, setSearch] = useState('')
   const [tab, setTab] = useState('students')
   const [open, setOpen] = useState(false)
-  const [form, setForm] = useState(ADD_USER_DEFAULT)
+  const [form, setForm] = useState<AddUserFormState>(() => buildAddUserForm())
   const [deleteTarget, setDeleteTarget] = useState<U | null>(null)
   const [deleting, setDeleting] = useState(false)
 
@@ -155,18 +230,51 @@ export default function AdminUsersPage() {
   }
 
   const addUser = async () => {
+    if (!form.full_name.trim() || !form.email.trim()) {
+      toast.error('Full name and email are required')
+      return
+    }
+    if (form.role === 'student') {
+      const gpaN = parseFloat(form.gpa)
+      if (Number.isNaN(gpaN) || gpaN < 0 || gpaN > 4) {
+        toast.error('GPA must be between 0.00 and 4.00')
+        return
+      }
+      const cr = parseInt(form.credits_completed, 10)
+      if (Number.isNaN(cr) || cr < 0) {
+        toast.error('Credits completed must be zero or a positive integer')
+        return
+      }
+    }
     try {
+      const payload: Record<string, unknown> = {
+        email: form.email.trim(),
+        password: form.password,
+        full_name: form.full_name.trim(),
+        role: form.role,
+        status: form.status,
+      }
+      if (form.role === 'student') {
+        payload.student_id = form.student_id.trim()
+        payload.major = form.major
+        payload.level = form.level
+        payload.gpa = parseFloat(form.gpa) || 0
+        payload.credits_completed = parseInt(form.credits_completed, 10) || 0
+        payload.phone = form.phone.trim()
+        payload.emergency_contact = form.emergency_contact.trim()
+      } else if (form.role === 'faculty') {
+        payload.faculty_id = form.faculty_id.trim()
+        payload.department = form.department
+        payload.office_location = form.office_location.trim()
+        payload.office_hours = form.office_hours.trim()
+        payload.phone = form.phone.trim()
+      }
+
       const r = await fetch(apiUrl('/admin/users'), {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: form.email.trim(),
-          password: form.password,
-          full_name: form.full_name.trim(),
-          role: form.role,
-          status: form.status,
-        }),
+        body: JSON.stringify(payload),
       })
       const d = await r.json()
       if (r.status === 409) {
@@ -184,7 +292,7 @@ export default function AdminUsersPage() {
           duration: 20000,
         })
       }
-      setForm(ADD_USER_DEFAULT)
+      setForm(buildAddUserForm())
       setOpen(false)
       await load()
     } catch (e) {
@@ -319,7 +427,7 @@ export default function AdminUsersPage() {
           <Button
             className="bg-[#e05a00] text-white hover:bg-[#c94f00]"
             onClick={() => {
-              setForm(ADD_USER_DEFAULT)
+              setForm(buildAddUserForm())
               setOpen(true)
             }}
           >
@@ -392,14 +500,14 @@ export default function AdminUsersPage() {
         open={open}
         onOpenChange={v => {
           setOpen(v)
-          if (v) setForm(ADD_USER_DEFAULT)
+          if (v) setForm(buildAddUserForm())
         }}
       >
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
+        <DialogContent className="flex max-h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
+          <DialogHeader className="shrink-0 border-b border-border px-6 py-4">
             <DialogTitle>Add user</DialogTitle>
           </DialogHeader>
-          <div className="grid gap-3 py-2">
+          <div className="grid gap-4 overflow-y-auto px-6 py-4">
             <div className="space-y-1">
               <Label htmlFor="add-full-name">Full name</Label>
               <Input
@@ -416,12 +524,31 @@ export default function AdminUsersPage() {
                 type="email"
                 value={form.email}
                 onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                onBlur={() => {
+                  setForm(f => {
+                    if (f.role === 'student') {
+                      const local = f.email.split('@')[0]?.trim().toLowerCase() ?? ''
+                      if (!local.startsWith('s.')) return f
+                      const rest = local.slice(2)
+                      if (!rest) return f
+                      return { ...f, student_id: `s.${rest}`, email: `${local}@pmu.edu.sa` }
+                    }
+                    if (f.role === 'faculty') {
+                      const local = f.email.split('@')[0]?.trim().toLowerCase() ?? ''
+                      if (!local.startsWith('f.')) return f
+                      const rest = local.slice(2)
+                      if (!rest) return f
+                      return { ...f, faculty_id: `f.${rest}`, email: `${local}@pmu.edu.sa` }
+                    }
+                    return f
+                  })
+                }}
                 placeholder="s.202099999@pmu.edu.sa"
                 autoComplete="off"
               />
               <p className="text-xs text-muted-foreground">
                 Students: <span className="font-mono">s.XXXXXXX@pmu.edu.sa</span> · Faculty:{' '}
-                <span className="font-mono">f.XXXXXXX@pmu.edu.sa</span> · Admin: often{' '}
+                <span className="font-mono">f.XXXXXX@pmu.edu.sa</span> · Admin: often{' '}
                 <span className="font-mono">admin@pmu.edu.sa</span> or any @pmu.edu.sa for new admins
               </p>
             </div>
@@ -449,7 +576,36 @@ export default function AdminUsersPage() {
             </div>
             <div className="space-y-1">
               <Label>Role</Label>
-              <Select value={form.role} onValueChange={v => setForm(f => ({ ...f, role: v as typeof f.role }))}>
+              <Select
+                value={form.role}
+                onValueChange={v => {
+                  const role = v as AddUserFormState['role']
+                  setForm(f => {
+                    if (role === 'student') {
+                      return {
+                        ...buildAddUserForm('student'),
+                        full_name: f.full_name,
+                        password: f.password,
+                        status: f.status,
+                      }
+                    }
+                    if (role === 'faculty') {
+                      return {
+                        ...buildAddUserForm('faculty'),
+                        full_name: f.full_name,
+                        password: f.password,
+                        status: f.status,
+                      }
+                    }
+                    return {
+                      ...buildAddUserForm('admin'),
+                      full_name: f.full_name,
+                      password: f.password,
+                      status: f.status,
+                    }
+                  })
+                }}
+              >
                 <SelectTrigger className="w-full min-w-0">
                   <SelectValue placeholder="Role" />
                 </SelectTrigger>
@@ -472,8 +628,167 @@ export default function AdminUsersPage() {
                 </SelectContent>
               </Select>
             </div>
+
+            {form.role === 'student' && (
+              <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
+                <div className="col-span-2 space-y-1 sm:col-span-1">
+                  <Label htmlFor="add-student-id">Student ID</Label>
+                  <Input
+                    id="add-student-id"
+                    value={form.student_id}
+                    onChange={e => setForm(f => ({ ...f, student_id: e.target.value }))}
+                    onBlur={() => {
+                      setForm(f => {
+                        let x = f.student_id.trim().replace(/^s\./i, '')
+                        if (!x) return f
+                        return { ...f, student_id: `s.${x}`, email: `s.${x}@pmu.edu.sa` }
+                      })
+                    }}
+                    placeholder="s.202099999"
+                    className="font-mono"
+                  />
+                  <p className="text-xs text-muted-foreground">Must match the s. prefix of the email.</p>
+                </div>
+                <div className="col-span-2 space-y-1 sm:col-span-1">
+                  <Label>Major</Label>
+                  <Select value={form.major} onValueChange={v => setForm(f => ({ ...f, major: v }))}>
+                    <SelectTrigger className="w-full min-w-0">
+                      <SelectValue placeholder="Major" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {MAJOR_OPTIONS.map(m => (
+                        <SelectItem key={m} value={m}>
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label>Academic level</Label>
+                  <Select value={form.level} onValueChange={v => setForm(f => ({ ...f, level: v }))}>
+                    <SelectTrigger className="w-full min-w-0">
+                      <SelectValue placeholder="Level" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {LEVEL_OPTIONS.map(l => (
+                        <SelectItem key={l} value={l}>
+                          {l}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="add-gpa">GPA (0.00 – 4.00)</Label>
+                  <Input
+                    id="add-gpa"
+                    type="number"
+                    min={0}
+                    max={4}
+                    step={0.01}
+                    value={form.gpa}
+                    onChange={e => setForm(f => ({ ...f, gpa: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="add-credits">Credits completed</Label>
+                  <Input
+                    id="add-credits"
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={form.credits_completed}
+                    onChange={e => setForm(f => ({ ...f, credits_completed: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="add-student-phone">Phone</Label>
+                  <Input
+                    id="add-student-phone"
+                    value={form.phone}
+                    onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                    placeholder="+966…"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="add-emergency">Emergency contact</Label>
+                  <Input
+                    id="add-emergency"
+                    value={form.emergency_contact}
+                    onChange={e => setForm(f => ({ ...f, emergency_contact: e.target.value }))}
+                    placeholder="Name / phone"
+                  />
+                </div>
+              </div>
+            )}
+
+            {form.role === 'faculty' && (
+              <div className="grid grid-cols-2 gap-4 border-t border-border pt-4">
+                <div className="col-span-2 space-y-1 sm:col-span-1">
+                  <Label htmlFor="add-faculty-id">Faculty ID</Label>
+                  <Input
+                    id="add-faculty-id"
+                    value={form.faculty_id}
+                    onChange={e => setForm(f => ({ ...f, faculty_id: e.target.value }))}
+                    onBlur={() => {
+                      setForm(f => {
+                        let x = f.faculty_id.trim().replace(/^f\./i, '')
+                        if (!x) return f
+                        return { ...f, faculty_id: `f.${x}`, email: `f.${x}@pmu.edu.sa` }
+                      })
+                    }}
+                    placeholder="f.100001"
+                    className="font-mono"
+                  />
+                  <p className="text-xs text-muted-foreground">Must match the f. prefix of the email.</p>
+                </div>
+                <div className="col-span-2 space-y-1 sm:col-span-1">
+                  <Label>Department</Label>
+                  <Select value={form.department} onValueChange={v => setForm(f => ({ ...f, department: v }))}>
+                    <SelectTrigger className="w-full min-w-0">
+                      <SelectValue placeholder="Department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {FACULTY_DEPARTMENTS.map(d => (
+                        <SelectItem key={d} value={d}>
+                          {d}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="col-span-2 space-y-1">
+                  <Label htmlFor="add-office-loc">Office location</Label>
+                  <Input
+                    id="add-office-loc"
+                    value={form.office_location}
+                    onChange={e => setForm(f => ({ ...f, office_location: e.target.value }))}
+                    placeholder="Building 3, Room 210"
+                  />
+                </div>
+                <div className="col-span-2 space-y-1">
+                  <Label htmlFor="add-office-hrs">Office hours</Label>
+                  <Input
+                    id="add-office-hrs"
+                    value={form.office_hours}
+                    onChange={e => setForm(f => ({ ...f, office_hours: e.target.value }))}
+                    placeholder="Sun–Thu 12:00–14:00"
+                  />
+                </div>
+                <div className="col-span-2 space-y-1 sm:col-span-1">
+                  <Label htmlFor="add-faculty-phone">Phone</Label>
+                  <Input
+                    id="add-faculty-phone"
+                    value={form.phone}
+                    onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                    placeholder="+966…"
+                  />
+                </div>
+              </div>
+            )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="shrink-0 border-t border-border px-6 py-4">
             <Button variant="outline" onClick={() => setOpen(false)}>
               Cancel
             </Button>
