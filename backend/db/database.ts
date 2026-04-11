@@ -10,6 +10,25 @@ function readSchemaSql(): string {
   return fs.readFileSync(PMU_SCHEMA_SQL_PATH, 'utf8')
 }
 
+const PMU_COURSE_CATALOG_PATH = path.join(process.cwd(), 'backend', 'db', 'pmu-course-catalog.json')
+
+type CatalogCourse = {
+  code: string
+  title: string
+  credits: number
+  department: string
+  prerequisites: string[]
+}
+
+function loadCourseCatalog(): CatalogCourse[] {
+  const raw = fs.readFileSync(PMU_COURSE_CATALOG_PATH, 'utf8')
+  return JSON.parse(raw) as CatalogCourse[]
+}
+
+function courseId(code: string) {
+  return `c-${code}`
+}
+
 function tableHasColumn(db: Database.Database, table: string, col: string): boolean {
   const rows = db.prepare(`PRAGMA table_info(${table})`).all() as { name: string }[]
   return rows.some(r => r.name === col)
@@ -174,7 +193,7 @@ function seed(db: Database.Database) {
       'Sun–Thu 12:00–14:00',
       '+966500000010',
       '',
-      '["CS101","CS201"]'
+      '["GEIT1411","GEIT1412","COSC3351","COSC4361"]'
     )
     insertFaculty.run(
       'u-f2',
@@ -185,80 +204,74 @@ function seed(db: Database.Database) {
       'Mon/Wed 10:00–12:00',
       '+966500000011',
       '',
-      '["MATH201"]'
+      '["MATH1422","MATH1423","MATH2313"]'
     )
 
-    const prereq = (codes: string[]) => JSON.stringify(codes)
+    db.exec(`DELETE FROM grades`)
+    db.exec(`DELETE FROM registrations`)
+    db.exec(`DELETE FROM sections`)
+    db.exec(`DELETE FROM courses`)
 
-    insertCourse.run('c-math101', 'MATH101', 'Calculus I', 3, 'Mathematics', 'Intro calculus', prereq([]))
-    insertCourse.run('c-cs101', 'CS101', 'Programming I', 3, 'Computer Science', 'Intro programming', prereq([]))
-    insertCourse.run('c-cs201', 'CS201', 'Data Structures', 3, 'Computer Science', 'DS', prereq(['CS101']))
-    insertCourse.run('c-cs301', 'CS301', 'Operating Systems', 3, 'Computer Science', 'OS', prereq(['CS201']))
-    insertCourse.run('c-cs401', 'CS401', 'Software Engineering', 3, 'Computer Science', 'SE', prereq(['CS301']))
-    insertCourse.run('c-math201', 'MATH201', 'Calculus II', 3, 'Mathematics', 'Calculus II', prereq(['MATH101']))
-    insertCourse.run('c-eng101', 'ENG101', 'English Composition', 3, 'English', 'Writing', prereq([]))
-
-    insertSection.run(
-      'sec-f25-cs101',
-      'c-cs101',
-      'u-f1',
-      'Fall 2025',
-      'Sun,Tue',
-      '08:00',
-      '09:30',
-      'A-101',
-      40,
-      35
-    )
-    insertSection.run(
-      'sec-f25-cs201',
-      'c-cs201',
-      'u-f1',
-      'Fall 2025',
-      'Sun,Tue',
-      '10:00',
-      '11:30',
-      'B-201',
-      35,
-      30
-    )
-    insertSection.run(
-      'sec-f25-eng101',
-      'c-eng101',
-      'u-f2',
-      'Fall 2025',
-      'Mon,Wed',
-      '09:00',
-      '10:30',
-      'E-101',
-      45,
-      40
-    )
+    const catalog = loadCourseCatalog()
+    for (const c of catalog) {
+      insertCourse.run(
+        courseId(c.code),
+        c.code,
+        c.title,
+        c.credits,
+        c.department,
+        '',
+        JSON.stringify(c.prerequisites)
+      )
+    }
 
     const sp = 'Spring 2026'
-    insertSection.run('sec-sp26-cs101', 'c-cs101', 'u-f1', sp, 'Sun,Tue', '08:00', '09:30', 'A-101', 40, 0)
-    insertSection.run('sec-sp26-cs201-a', 'c-cs201', 'u-f1', sp, 'Sun,Tue', '10:00', '11:30', 'B-201', 35, 0)
-    insertSection.run('sec-sp26-cs201-b', 'c-cs201', 'u-f1', sp, 'Mon,Wed', '14:00', '15:30', 'B-205', 35, 0)
-    insertSection.run('sec-sp26-cs301', 'c-cs301', 'u-f1', sp, 'Mon,Wed', '10:00', '11:30', 'C-301', 30, 0)
-    insertSection.run('sec-sp26-cs401', 'c-cs401', 'u-f1', sp, 'Sun,Tue', '14:00', '15:30', 'C-401', 28, 0)
-    insertSection.run('sec-sp26-math201', 'c-math201', 'u-f2', sp, 'Sun,Tue', '10:00', '11:30', 'M-201', 40, 0)
-    insertSection.run('sec-sp26-eng101', 'c-eng101', 'u-f2', sp, 'Mon,Wed', '08:00', '09:30', 'E-101', 45, 0)
+    const fall = 'Fall 2025'
+    const demoFaculty = 'u-f1'
+
+    const springSections: [string, string, string, string, string][] = [
+      ['GEIT1411', 'Sun,Tue', '08:00', '09:30', 'GEIT-A101'],
+      ['GEIT1412', 'Sun,Tue', '10:00', '11:30', 'GEIT-A102'],
+      ['GEIT2421', 'Mon,Wed', '08:00', '09:30', 'GEIT-B201'],
+      ['GEIT2331', 'Mon,Wed', '10:00', '11:30', 'GEIT-B202'],
+      ['GEIT3341', 'Sun,Tue', '14:00', '15:30', 'GEIT-C301'],
+      ['GEIT3331', 'Mon,Wed', '14:00', '15:30', 'GEIT-C302'],
+      ['GEIT3351', 'Tue,Thu', '08:00', '09:30', 'GEIT-D401'],
+      ['MATH1422', 'Sun,Tue', '12:00', '13:30', 'MATH-M101'],
+      ['MATH1423', 'Mon,Wed', '12:00', '13:30', 'MATH-M102'],
+      ['MATH2313', 'Tue,Thu', '10:00', '11:30', 'MATH-M201'],
+      ['COSC3351', 'Sun,Tue', '16:00', '17:30', 'COSC-LAB1'],
+      ['COSC4361', 'Mon,Wed', '16:00', '17:30', 'COSC-LAB2'],
+      ['COSC4362', 'Tue,Thu', '14:00', '15:30', 'COSC-AI01'],
+    ]
+    for (const [code, days, st, en, room] of springSections) {
+      insertSection.run(`sec-sp26-${code}`, courseId(code), demoFaculty, sp, days, st, en, room, 35, 0)
+    }
+
+    const fallSections: [string, string, string, string, string, string][] = [
+      ['GEIT1411', 'u-f1', 'Sun,Tue', '08:00', '09:30', 'GEIT-A101'],
+      ['GEIT1412', 'u-f1', 'Sun,Tue', '10:00', '11:30', 'GEIT-A102'],
+      ['COMM1311', 'u-f2', 'Mon,Wed', '09:00', '10:30', 'COMM-E101'],
+    ]
+    for (const [code, fid, days, st, en, room] of fallSections) {
+      insertSection.run(`sec-f25-${code}`, courseId(code), fid, fall, days, st, en, room, 35, 28)
+    }
 
     const insertGrade = db.prepare(
       `INSERT INTO grades (id, student_id, section_id, midterm, final, assignment, calculated_grade, override_grade, letter_grade, submitted_at, is_final)
        VALUES (?, ?, ?, ?, ?, ?, ?, NULL, ?, ?, 1)`
     )
-    insertGrade.run('g1', 'u-s1', 'sec-f25-cs101', 88, 92, 90, 90, 'A-', now)
-    insertGrade.run('g2', 'u-s1', 'sec-f25-cs201', 82, 85, 80, 83.25, 'B', now)
-    insertGrade.run('g3', 'u-s1', 'sec-f25-eng101', 90, 88, 92, 90, 'A-', now)
+    insertGrade.run('g1', 'u-s1', 'sec-f25-GEIT1411', 88, 92, 90, 90, 'A-', now)
+    insertGrade.run('g2', 'u-s1', 'sec-f25-GEIT1412', 82, 85, 80, 83.25, 'B', now)
+    insertGrade.run('g3', 'u-s1', 'sec-f25-COMM1311', 90, 88, 92, 90, 'A-', now)
 
     const insertReg = db.prepare(
       `INSERT INTO registrations (id, student_id, section_id, semester, status, registered_at, attendance_pct)
        VALUES (?, ?, ?, ?, 'registered', ?, ?)`
     )
-    insertReg.run('r1', 'u-s1', 'sec-sp26-cs301', sp, now, 96)
-    insertReg.run('r2', 'u-s1', 'sec-sp26-eng101', sp, now, 100)
-    insertReg.run('r3', 'u-s2', 'sec-sp26-cs201-a', sp, now, 92)
+    insertReg.run('r1', 'u-s1', 'sec-sp26-COSC4361', sp, now, 96)
+    insertReg.run('r2', 'u-s1', 'sec-sp26-COSC4362', sp, now, 100)
+    insertReg.run('r3', 'u-s2', 'sec-sp26-GEIT2421', sp, now, 92)
 
     db.prepare(
       `INSERT INTO announcements (id, title, content, target_role, created_by, created_at)

@@ -1,0 +1,1381 @@
+[
+  {
+    "code": "ALIS1211",
+    "title": "Introduction to Islamic Culture",
+    "credits": 2,
+    "department": "ALIS",
+    "prerequisites": []
+  },
+  {
+    "code": "ALIS1212",
+    "title": "The Social System in Islam",
+    "credits": 2,
+    "department": "ALIS",
+    "prerequisites": [
+      "ALIS1211"
+    ]
+  },
+  {
+    "code": "ALIS2211",
+    "title": "Linguistic Communication Skills",
+    "credits": 2,
+    "department": "ALIS",
+    "prerequisites": [
+      "ALIS1212"
+    ]
+  },
+  {
+    "code": "ALIS2212",
+    "title": "The Biography of Prophet Mohammad",
+    "credits": 2,
+    "department": "ALIS",
+    "prerequisites": [
+      "ALIS2211"
+    ]
+  },
+  {
+    "code": "COMM1311",
+    "title": "Written Communication",
+    "credits": 3,
+    "department": "COMM",
+    "prerequisites": []
+  },
+  {
+    "code": "COMM1312",
+    "title": "Writing and Research",
+    "credits": 3,
+    "department": "COMM",
+    "prerequisites": [
+      "COMM1311"
+    ]
+  },
+  {
+    "code": "COMM2311",
+    "title": "Oral Communication",
+    "credits": 3,
+    "department": "COMM",
+    "prerequisites": [
+      "COMM1312"
+    ]
+  },
+  {
+    "code": "COMM2312",
+    "title": "Technical and Professional Communications",
+    "credits": 3,
+    "department": "COMM",
+    "prerequisites": [
+      "COMM2311"
+    ]
+  },
+  {
+    "code": "UNIV1211",
+    "title": "Prof. Development and Competencies",
+    "credits": 2,
+    "department": "UNIV",
+    "prerequisites": []
+  },
+  {
+    "code": "UNIV1212",
+    "title": "Critical Thinking and Problem Solving",
+    "credits": 2,
+    "department": "UNIV",
+    "prerequisites": [
+      "UNIV1211"
+    ]
+  },
+  {
+    "code": "UNIV1213",
+    "title": "Leadership and Teamwork",
+    "credits": 2,
+    "department": "UNIV",
+    "prerequisites": [
+      "UNIV1212"
+    ]
+  },
+  {
+    "code": "PHED1111",
+    "title": "Active Living Lifestyle",
+    "credits": 1,
+    "department": "PHED",
+    "prerequisites": []
+  },
+  {
+    "code": "PHED1112",
+    "title": "Healthy Behaviors and Management",
+    "credits": 1,
+    "department": "PHED",
+    "prerequisites": [
+      "PHED1111"
+    ]
+  },
+  {
+    "code": "GEIT1411",
+    "title": "Computer Science I",
+    "credits": 4,
+    "department": "GEIT",
+    "prerequisites": []
+  },
+  {
+    "code": "GEIT1412",
+    "title": "Computer Science II",
+    "credits": 4,
+    "department": "GEIT",
+    "prerequisites": [
+      "GEIT1411"
+    ]
+  },
+  {
+    "code": "GEIT2421",
+    "title": "Data Structures",
+    "credits": 4,
+    "department": "GEIT",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "GEIT2331",
+    "title": "Mathematical Reasoning and Algorithmic Thinking",
+    "credits": 3,
+    "department": "GEIT",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "GEIT2291",
+    "title": "Professional Ethics",
+    "credits": 2,
+    "department": "GEIT",
+    "prerequisites": []
+  },
+  {
+    "code": "GEIT3341",
+    "title": "Database I",
+    "credits": 3,
+    "department": "GEIT",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "GEIT3331",
+    "title": "Computer Organization",
+    "credits": 3,
+    "department": "GEIT",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "GEIT3351",
+    "title": "Principles of Software Engineering",
+    "credits": 3,
+    "department": "GEIT",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "GEIT4361",
+    "title": "Internship",
+    "credits": 3,
+    "department": "GEIT",
+    "prerequisites": []
+  },
+  {
+    "code": "ASSE2111",
+    "title": "Learning Outcome Assessment I",
+    "credits": 1,
+    "department": "ASSE",
+    "prerequisites": []
+  },
+  {
+    "code": "ASSE3211",
+    "title": "Learning Outcome Assessment II",
+    "credits": 2,
+    "department": "ASSE",
+    "prerequisites": [
+      "ASSE2111"
+    ]
+  },
+  {
+    "code": "ASSE4311",
+    "title": "Learning Outcome Assessment III",
+    "credits": 3,
+    "department": "ASSE",
+    "prerequisites": [
+      "ASSE3211"
+    ]
+  },
+  {
+    "code": "MATH1422",
+    "title": "Calculus I",
+    "credits": 4,
+    "department": "MATH",
+    "prerequisites": []
+  },
+  {
+    "code": "MATH1423",
+    "title": "Calculus II",
+    "credits": 4,
+    "department": "MATH",
+    "prerequisites": [
+      "MATH1422"
+    ]
+  },
+  {
+    "code": "MATH1324",
+    "title": "Calculus III",
+    "credits": 3,
+    "department": "MATH",
+    "prerequisites": [
+      "MATH1423"
+    ]
+  },
+  {
+    "code": "MATH2313",
+    "title": "Probability and Statistics",
+    "credits": 3,
+    "department": "MATH",
+    "prerequisites": [
+      "MATH1423"
+    ]
+  },
+  {
+    "code": "MATH3433",
+    "title": "Linear Algebra and Differential Equation",
+    "credits": 4,
+    "department": "MATH",
+    "prerequisites": [
+      "MATH1423"
+    ]
+  },
+  {
+    "code": "PHYS1421",
+    "title": "Physics for Engineers I",
+    "credits": 4,
+    "department": "PHYS",
+    "prerequisites": []
+  },
+  {
+    "code": "PHYS1422",
+    "title": "Physics for Engineers II",
+    "credits": 4,
+    "department": "PHYS",
+    "prerequisites": [
+      "PHYS1421",
+      "MATH1422"
+    ]
+  },
+  {
+    "code": "COEN2411",
+    "title": "Circuits",
+    "credits": 4,
+    "department": "COEN",
+    "prerequisites": [
+      "MATH1423",
+      "PHYS1422"
+    ]
+  },
+  {
+    "code": "COEN3323",
+    "title": "Digital and Logic Design",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN2411"
+    ]
+  },
+  {
+    "code": "COEN3361",
+    "title": "Computer Networks",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "MATH2313",
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "COEN3421",
+    "title": "Electronics",
+    "credits": 4,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN2411"
+    ]
+  },
+  {
+    "code": "COEN4361",
+    "title": "Operating Systems",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "COEN4322",
+    "title": "Digital Signal Processing",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN3323",
+      "MATH2313"
+    ]
+  },
+  {
+    "code": "COEN4413",
+    "title": "Embedded Systems",
+    "credits": 4,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN4361",
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "COEN4331",
+    "title": "Microprocessors",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN3323",
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "COEN4371",
+    "title": "Synthesis with Hardware Description Languages",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN3323"
+    ]
+  },
+  {
+    "code": "COEN4394",
+    "title": "Digital Video Processing",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN4322"
+    ]
+  },
+  {
+    "code": "COEN4395",
+    "title": "Wireless and Mobile Computing",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "COEN3361"
+    ]
+  },
+  {
+    "code": "COEN4396",
+    "title": "Modern Control Theory",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "MATH3433",
+      "COEN3421"
+    ]
+  },
+  {
+    "code": "COEN4397",
+    "title": "Robotics",
+    "credits": 3,
+    "department": "COEN",
+    "prerequisites": [
+      "MATH3433",
+      "COEN3421"
+    ]
+  },
+  {
+    "code": "COSC2312",
+    "title": "Web Programming",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT1411"
+    ]
+  },
+  {
+    "code": "COSC3332",
+    "title": "Discrete Structures and Combinatorial Analysis",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT2331"
+    ]
+  },
+  {
+    "code": "COSC3351",
+    "title": "Algorithms",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "COSC3354",
+    "title": "Introduction to Cryptography",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "COSC3361",
+    "title": "Computer Networks",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "MATH2313",
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "COSC3411",
+    "title": "Systems Programming",
+    "credits": 4,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "COSC4361",
+    "title": "Operating Systems",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3411"
+    ]
+  },
+  {
+    "code": "COSC4362",
+    "title": "Artificial Intelligence",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3351"
+    ]
+  },
+  {
+    "code": "COSC4363",
+    "title": "Theory of Computation",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3351",
+      "MATH3433"
+    ]
+  },
+  {
+    "code": "COSC4371",
+    "title": "Computer Graphics",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "COSC4373",
+    "title": "Computer Vision",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT2421",
+      "MATH2313"
+    ]
+  },
+  {
+    "code": "COSC4461",
+    "title": "Programming Languages",
+    "credits": 4,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3411"
+    ]
+  },
+  {
+    "code": "COSC3357",
+    "title": "Logic and Formal Verification",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT2331"
+    ]
+  },
+  {
+    "code": "COSC3359",
+    "title": "Computer Animation",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "COSC4311",
+    "title": "Parallel Computing",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3351"
+    ]
+  },
+  {
+    "code": "COSC4352",
+    "title": "Formal Methods in Software Engineering",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "COSC4364",
+    "title": "Compilers",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3351",
+      "COSC4461"
+    ]
+  },
+  {
+    "code": "COSC4372",
+    "title": "Distributed Systems and Algorithms",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3351",
+      "COSC4361"
+    ]
+  },
+  {
+    "code": "COSC4376",
+    "title": "Bioinformatics",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3351"
+    ]
+  },
+  {
+    "code": "COSC4380",
+    "title": "Quantum Information and Computation",
+    "credits": 3,
+    "department": "COSC",
+    "prerequisites": [
+      "COSC3351"
+    ]
+  },
+  {
+    "code": "SOEN2312",
+    "title": "Web Programming",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT1411"
+    ]
+  },
+  {
+    "code": "SOEN2332",
+    "title": "Discrete Structure and Combinatorial Analysis",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT2331"
+    ]
+  },
+  {
+    "code": "SOEN3311",
+    "title": "Requirements Engineering",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "SOEN3351",
+    "title": "Algorithms",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "SOEN3361",
+    "title": "Computer Networks",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "MATH2313",
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "SOEN4311",
+    "title": "Software Architecture and Design",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "SOEN3311"
+    ]
+  },
+  {
+    "code": "SOEN4312",
+    "title": "Software Testing and Quality Assurance",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "SOEN4313",
+    "title": "Software Project Management",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "SOEN4361",
+    "title": "Operating Systems",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "SOEN4371",
+    "title": "E-Commerce",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT3341",
+      "SOEN2312"
+    ]
+  },
+  {
+    "code": "SOEN3314",
+    "title": "Formal Methods in Software Engineering",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT2331"
+    ]
+  },
+  {
+    "code": "SOEN3321",
+    "title": "Programming in UNIX Environments",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "SOEN4361",
+      "SOEN3351"
+    ]
+  },
+  {
+    "code": "SOEN3463",
+    "title": "Distributed System",
+    "credits": 4,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT1412",
+      "SOEN3361"
+    ]
+  },
+  {
+    "code": "SOEN4315",
+    "title": "Cloud Computing",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "SOEN4316",
+    "title": "Concurrent Programming",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT2421",
+      "SOEN3351"
+    ]
+  },
+  {
+    "code": "SOEN4321",
+    "title": "Software Maintenance and Evolution",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT3351",
+      "SOEN4312"
+    ]
+  },
+  {
+    "code": "SOEN4322",
+    "title": "Software Security",
+    "credits": 3,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "SOEN4461",
+    "title": "Programming Languages",
+    "credits": 4,
+    "department": "SOEN",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "SOEN4463",
+    "title": "Data Mining",
+    "credits": 4,
+    "department": "SOEN",
+    "prerequisites": [
+      "MATH2313",
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "ITAP1311",
+    "title": "Intro to IT",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": []
+  },
+  {
+    "code": "ITAP2312",
+    "title": "Web Programming",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT1411"
+    ]
+  },
+  {
+    "code": "ITAP2431",
+    "title": "Network Management",
+    "credits": 4,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "ITAP3313",
+    "title": "User Interface Development",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT1412",
+      "ITAP2312"
+    ]
+  },
+  {
+    "code": "ITAP3371",
+    "title": "Database II",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "ITAP3382",
+    "title": "Business Intelligence",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "ITAP3383",
+    "title": "Enterprise Resource Planning Systems",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3341",
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "ITAP3411",
+    "title": "Systems Programming",
+    "credits": 4,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "ITAP3431",
+    "title": "Network Security",
+    "credits": 4,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP2431"
+    ]
+  },
+  {
+    "code": "ITAP3471",
+    "title": "Web Server Administration",
+    "credits": 4,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP2312",
+      "ITAP3411"
+    ]
+  },
+  {
+    "code": "ITAP4316",
+    "title": "Introduction to Project Management",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "ITAP4371",
+    "title": "e-Commerce",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3341",
+      "ITAP2312"
+    ]
+  },
+  {
+    "code": "ITAP4361",
+    "title": "Operating Systems",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP3411"
+    ]
+  },
+  {
+    "code": "ITAP3362",
+    "title": "Mobile Applications Design and Development",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP2312",
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "ITAP3363",
+    "title": "Principles of Open Source and Enterprise Computing with JAVA",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP2312",
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "ITAP4313",
+    "title": "Advanced Visual Programming",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP3313",
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "ITAP4314",
+    "title": "Multimedia Computing and Applications",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP2312"
+    ]
+  },
+  {
+    "code": "ITAP4315",
+    "title": "Cloud Computing",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3331",
+      "ITAP2431"
+    ]
+  },
+  {
+    "code": "ITAP4362",
+    "title": "Network Administration",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP4361",
+      "ITAP2431"
+    ]
+  },
+  {
+    "code": "ITAP4363",
+    "title": "Systems Administration",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP4361",
+      "ITAP2431"
+    ]
+  },
+  {
+    "code": "ITAP4364",
+    "title": "Performance Analysis of Computer Networks",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "MATH1313",
+      "ITAP2431",
+      "ITAP3411"
+    ]
+  },
+  {
+    "code": "ITAP4367",
+    "title": "Database Administration",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP4361",
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "ITAP4376",
+    "title": "Secure e-Commerce",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3331",
+      "ITAP4371"
+    ]
+  },
+  {
+    "code": "ITAP4390",
+    "title": "Information Security and Assurance",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP4361",
+      "ITAP3431"
+    ]
+  },
+  {
+    "code": "ITAP4396",
+    "title": "Computer and Network Forensics",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "ITAP4390",
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "ITAP3315",
+    "title": "Software Testing and Quality Assurance",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "ITAP4391",
+    "title": "Reuse and Component-based Development",
+    "credits": 3,
+    "department": "ITAP",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "AINT2311",
+    "title": "Introduction to AI",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "AINT2412",
+    "title": "Scripting Languages for AI",
+    "credits": 4,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "AINT3332",
+    "title": "Discrete Structures and Combinatorial Analysis",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT2331"
+    ]
+  },
+  {
+    "code": "AINT3351",
+    "title": "Algorithms",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "AINT3411",
+    "title": "Introduction to Machine Learning",
+    "credits": 4,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT2412",
+      "MATH2313"
+    ]
+  },
+  {
+    "code": "AINT3421",
+    "title": "Deep Learning",
+    "credits": 4,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3411"
+    ]
+  },
+  {
+    "code": "AINT4373",
+    "title": "Computer Vision",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "MATH3433"
+    ]
+  },
+  {
+    "code": "AINT3354",
+    "title": "Introduction to Cryptography",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "AINT3357",
+    "title": "Logic and Formal Verification",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT2331"
+    ]
+  },
+  {
+    "code": "AINT3361",
+    "title": "Computer Networks",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "MATH2313",
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "AINT3371",
+    "title": "Database II",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT3341"
+    ]
+  },
+  {
+    "code": "AINT3381",
+    "title": "Big Data Analytics",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3411"
+    ]
+  },
+  {
+    "code": "AINT4311",
+    "title": "Parallel Computing",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3351"
+    ]
+  },
+  {
+    "code": "AINT4361",
+    "title": "Operating Systems",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "AINT4362",
+    "title": "Multi Agent Systems",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3411"
+    ]
+  },
+  {
+    "code": "AINT4371",
+    "title": "Computer Graphics",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "AINT4372",
+    "title": "Distributed Systems and Algorithms",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3351"
+    ]
+  },
+  {
+    "code": "AINT4374",
+    "title": "Text Mining",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3411"
+    ]
+  },
+  {
+    "code": "AINT4376",
+    "title": "Bioinformatics",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3351"
+    ]
+  },
+  {
+    "code": "AINT4380",
+    "title": "Quantum Information and Computation",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3351"
+    ]
+  },
+  {
+    "code": "AINT4381",
+    "title": "Intelligent Robotics",
+    "credits": 3,
+    "department": "AINT",
+    "prerequisites": [
+      "AINT3411"
+    ]
+  },
+  {
+    "code": "CSEC1311",
+    "title": "Intro to Cybersecurity",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": []
+  },
+  {
+    "code": "CSEC2331",
+    "title": "Digital Forensics",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT2291"
+    ]
+  },
+  {
+    "code": "CSEC2431",
+    "title": "Network Management",
+    "credits": 4,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "CSEC3352",
+    "title": "Secure Software Engineering",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT3351"
+    ]
+  },
+  {
+    "code": "CSEC3354",
+    "title": "Intro to Cryptography",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "CSEC3355",
+    "title": "Scripting Languages",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT1412"
+    ]
+  },
+  {
+    "code": "CSEC3431",
+    "title": "Network Security",
+    "credits": 4,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC2431"
+    ]
+  },
+  {
+    "code": "CSEC3432",
+    "title": "Cyber Operations",
+    "credits": 4,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC2431"
+    ]
+  },
+  {
+    "code": "CSEC4361",
+    "title": "Operating Systems",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "CSEC4362",
+    "title": "Machine Learning",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT2421"
+    ]
+  },
+  {
+    "code": "CSEC4471",
+    "title": "Vulnerability and Penetration Testing",
+    "credits": 4,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC3355"
+    ]
+  },
+  {
+    "code": "CSEC4472",
+    "title": "Systems Security",
+    "credits": 4,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC4361"
+    ]
+  },
+  {
+    "code": "CSEC4363",
+    "title": "Web Application Penetration Testing",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC3355"
+    ]
+  },
+  {
+    "code": "CSEC4364",
+    "title": "ICS/SCADA Security Essentials",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC3355"
+    ]
+  },
+  {
+    "code": "CSEC4365",
+    "title": "Critical Security Controls",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC3355"
+    ]
+  },
+  {
+    "code": "CSEC4376",
+    "title": "Secure E-Commerce",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "GEIT3331"
+    ]
+  },
+  {
+    "code": "CSEC4377",
+    "title": "Network Administration",
+    "credits": 3,
+    "department": "CSEC",
+    "prerequisites": [
+      "CSEC4361",
+      "CSEC2431"
+    ]
+  },
+  {
+    "code": "MATH1311",
+    "title": "Finite Math",
+    "credits": 3,
+    "department": "MATH",
+    "prerequisites": []
+  },
+  {
+    "code": "MATH1312",
+    "title": "Calculus for Business",
+    "credits": 3,
+    "department": "MATH",
+    "prerequisites": [
+      "MATH1311"
+    ]
+  },
+  {
+    "code": "MATH1313",
+    "title": "Statistical Methods",
+    "credits": 3,
+    "department": "MATH",
+    "prerequisites": []
+  }
+]

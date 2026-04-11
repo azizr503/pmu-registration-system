@@ -11,12 +11,14 @@ function isPublic(pathname: string) {
   return PUBLIC_PREFIXES.some(p => pathname === p || pathname.startsWith(`${p}/`))
 }
 
-function homeForClaims(claims: { role: string; profileCompleted?: boolean | number }) {
-  const pc =
-    typeof claims.profileCompleted === 'boolean'
-      ? claims.profileCompleted
-      : Boolean(claims.profileCompleted)
-  if (claims.role === 'student' && !pc) {
+/** Treat only explicit completion (JWT from login uses boolean true when profile_completed = 1). */
+function studentProfileIsComplete(claims: { role: string; profileCompleted?: boolean | number | null }) {
+  if (claims.role !== 'student') return true
+  return claims.profileCompleted === true || claims.profileCompleted === 1
+}
+
+function homeForClaims(claims: { role: string; profileCompleted?: boolean | number | null }) {
+  if (claims.role === 'student' && !studentProfileIsComplete(claims)) {
     return '/student/profile-setup'
   }
   return roleHomePath(claims.role as UserRole)
@@ -66,11 +68,7 @@ export async function middleware(request: NextRequest) {
     if (role !== 'student') {
       return NextResponse.redirect(new URL(roleHomePath(role), request.url))
     }
-    if (
-      !pathname.startsWith('/student/profile-setup') &&
-      !claims.profileCompleted &&
-      role === 'student'
-    ) {
+    if (!pathname.startsWith('/student/profile-setup') && role === 'student' && !studentProfileIsComplete(claims)) {
       return NextResponse.redirect(new URL('/student/profile-setup', request.url))
     }
   }

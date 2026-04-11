@@ -59,15 +59,80 @@ adminRouter.get('/users', (_req, res) => {
   }
 })
 
+const STUDENT_MAJORS = new Set([
+  'Computer Science',
+  'Computer Engineering',
+  'Software Engineering',
+  'Information Technology',
+  'Artificial Intelligence',
+  'Cybersecurity',
+])
+
+const STUDENT_LEVELS = new Set(['Freshman', 'Sophomore', 'Junior', 'Senior'])
+
+const FACULTY_DEPARTMENTS = new Set([
+  'Computer Science',
+  'Computer Engineering',
+  'Software Engineering',
+  'Information Technology',
+  'Artificial Intelligence',
+  'Cybersecurity',
+  'Mathematics',
+  'Physics',
+  'English',
+])
+
+function normalizeStudentIdField(raw: unknown): string {
+  if (raw == null) return ''
+  let s = String(raw).trim()
+  if (s.toLowerCase().startsWith('s.')) s = s.slice(2)
+  return s
+}
+
+function normalizeFacultyIdField(raw: unknown): string {
+  if (raw == null) return ''
+  let s = String(raw).trim()
+  if (s.toLowerCase().startsWith('f.')) s = s.slice(2)
+  return s
+}
+
 adminRouter.post('/users', async (req, res) => {
   try {
     const body = req.body || {}
-    const { email, password, full_name, role, status } = body as {
+    const {
+      email,
+      password,
+      full_name,
+      role,
+      status,
+      student_id: bodyStudentId,
+      major,
+      level,
+      gpa: bodyGpa,
+      credits_completed: bodyCredits,
+      phone: bodyPhone,
+      emergency_contact,
+      faculty_id: bodyFacultyId,
+      department,
+      office_location,
+      office_hours,
+    } = body as {
       email: string
       password: string
       full_name: string
       role: 'student' | 'faculty' | 'admin'
       status?: UserStatus
+      student_id?: string
+      major?: string
+      level?: string
+      gpa?: number | string
+      credits_completed?: number | string
+      phone?: string
+      emergency_contact?: string
+      faculty_id?: string
+      department?: string
+      office_location?: string
+      office_hours?: string
     }
 
     const emailNorm = typeof email === 'string' ? email.trim().toLowerCase() : ''
@@ -106,9 +171,62 @@ adminRouter.post('/users', async (req, res) => {
     }
     if (role === 'faculty' && !inferred?.facultyId) {
       return res.status(400).json({
-        error: 'Faculty accounts must use an email like f.XXXXXXX@pmu.edu.sa',
+        error: 'Faculty accounts must use an email like f.XXXXXX@pmu.edu.sa',
       })
     }
+
+    const sidFromField = normalizeStudentIdField(bodyStudentId)
+    if (role === 'student' && inferred?.studentId && sidFromField && sidFromField !== inferred.studentId) {
+      return res.status(400).json({
+        error: 'Student ID must match the email local part (e.g. s.202012345@pmu.edu.sa and Student ID s.202012345)',
+      })
+    }
+
+    const fidFromField = normalizeFacultyIdField(bodyFacultyId)
+    if (role === 'faculty' && inferred?.facultyId && fidFromField && fidFromField !== inferred.facultyId) {
+      return res.status(400).json({
+        error: 'Faculty ID must match the email local part (e.g. f.100001@pmu.edu.sa and Faculty ID f.100001)',
+      })
+    }
+
+    let majorNorm = typeof major === 'string' ? major.trim() : ''
+    let levelNorm = typeof level === 'string' ? level.trim() : ''
+    let deptNorm = typeof department === 'string' ? department.trim() : ''
+
+    if (role === 'student') {
+      if (!majorNorm || !STUDENT_MAJORS.has(majorNorm)) {
+        return res.status(400).json({ error: 'Valid major is required for students' })
+      }
+      if (!levelNorm || !STUDENT_LEVELS.has(levelNorm)) {
+        return res.status(400).json({ error: 'Valid academic level is required for students' })
+      }
+    }
+
+    if (role === 'faculty') {
+      if (!deptNorm || !FACULTY_DEPARTMENTS.has(deptNorm)) {
+        return res.status(400).json({ error: 'Valid department is required for faculty' })
+      }
+    }
+
+    let gpaVal = 0
+    let creditsVal = 0
+    if (role === 'student') {
+      const gpaNum = typeof bodyGpa === 'number' ? bodyGpa : parseFloat(String(bodyGpa ?? '0'))
+      if (Number.isNaN(gpaNum) || gpaNum < 0 || gpaNum > 4) {
+        return res.status(400).json({ error: 'GPA must be between 0.00 and 4.00' })
+      }
+      gpaVal = Math.round(gpaNum * 100) / 100
+      const cr = typeof bodyCredits === 'number' ? bodyCredits : parseInt(String(bodyCredits ?? '0'), 10)
+      if (Number.isNaN(cr) || cr < 0) {
+        return res.status(400).json({ error: 'Credits completed must be a non-negative integer' })
+      }
+      creditsVal = cr
+    }
+
+    const phoneNorm = typeof bodyPhone === 'string' ? bodyPhone.trim() : ''
+    const emerg = typeof emergency_contact === 'string' ? emergency_contact.trim() : ''
+    const officeLoc = typeof office_location === 'string' ? office_location.trim() : ''
+    const officeHrs = typeof office_hours === 'string' ? office_hours.trim() : ''
 
     const db = getDb()
     const exists = db.prepare(`SELECT id FROM users WHERE lower(email) = lower(?)`).get(emailNorm) as
@@ -116,6 +234,23 @@ adminRouter.post('/users', async (req, res) => {
       | undefined
     if (exists) {
       return res.status(409).json({ error: 'Email already in use' })
+    }
+
+    if (role === 'student' && inferred?.studentId) {
+      const dupeSid = db.prepare(`SELECT user_id FROM students WHERE student_id = ?`).get(inferred.studentId) as
+        | { user_id: string }
+        | undefined
+      if (dupeSid) {
+        return res.status(409).json({ error: 'That student ID is already in use' })
+      }
+    }
+    if (role === 'faculty' && inferred?.facultyId) {
+      const dupeFid = db.prepare(`SELECT user_id FROM faculty WHERE faculty_id = ?`).get(inferred.facultyId) as
+        | { user_id: string }
+        | undefined
+      if (dupeFid) {
+        return res.status(409).json({ error: 'That faculty ID is already in use' })
+      }
     }
 
     const id = randomUUID()
@@ -131,13 +266,23 @@ adminRouter.post('/users', async (req, res) => {
       if (role === 'student' && inferred?.studentId) {
         db.prepare(
           `INSERT INTO students (user_id, student_id, full_name, major, minor, level, gpa, credits_completed, advisor_id, phone, emergency_contact, profile_completed)
-           VALUES (?, ?, ?, '', '', 'Freshman', 0, 0, NULL, '', '', 0)`
-        ).run(id, inferred.studentId, fullName)
+           VALUES (?, ?, ?, ?, '', ?, ?, ?, NULL, ?, ?, 1)`
+        ).run(
+          id,
+          inferred.studentId,
+          fullName,
+          majorNorm,
+          levelNorm,
+          gpaVal,
+          creditsVal,
+          phoneNorm,
+          emerg
+        )
       } else if (role === 'faculty' && inferred?.facultyId) {
         db.prepare(
           `INSERT INTO faculty (user_id, faculty_id, full_name, department, office_location, office_hours, phone, photo_url, courses_history)
-           VALUES (?, ?, ?, '', '', '', '', '', '[]')`
-        ).run(id, inferred.facultyId, fullName)
+           VALUES (?, ?, ?, ?, ?, ?, ?, '', '[]')`
+        ).run(id, inferred.facultyId, fullName, deptNorm, officeLoc, officeHrs, phoneNorm)
       }
     })
     run()

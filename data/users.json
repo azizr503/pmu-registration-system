@@ -109,7 +109,7 @@
       "office_hours": "Sun–Thu 12:00–14:00",
       "phone": "+966500000010",
       "photo_url": "",
-      "courses_history": "[\"CS101\",\"CS201\"]"
+      "courses_history": "[\"GEIT1411\",\"GEIT1412\",\"COSC3351\",\"COSC4361\"]"
     },
     {
       "user_id": "u-f2",
@@ -120,7 +120,7 @@
       "office_hours": "Mon/Wed 10:00–12:00",
       "phone": "+966500000011",
       "photo_url": "",
-      "courses_history": "[\"MATH201\"]"
+      "courses_history": "[\"MATH1422\",\"MATH1423\",\"MATH2313\"]"
     }
   ]
 }
