@@ -51,7 +51,16 @@ export default function StudentAccountsPage() {
           <CardTitle>View Holds</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-emerald-600">No holds on your account ✅</p>
+          <p className="flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400">
+            <img
+              src="/img/check-circle.svg"
+              alt=""
+              className="h-4 w-4 shrink-0 dark:invert"
+              width={16}
+              height={16}
+            />
+            No holds on your account
+          </p>
         </CardContent>
       </Card>
 

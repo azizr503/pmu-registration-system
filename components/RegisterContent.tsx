@@ -8,7 +8,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, User, Mail, Lock, UserCheck } from 'lucide-react'
+import { Loader2, Lock, Mail, User, UserCheck } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { toast } from 'sonner'
 import { registerApi } from '@/lib/api/auth'
 import { normalizePmuEmail } from '@/lib/email-normalize'
@@ -80,7 +81,10 @@ export default function RegisterContent() {
   }
 
   return (
-    <div className="flex-1 bg-pmu-gray flex items-center justify-center p-4">
+    <div className="relative flex flex-1 items-center justify-center bg-pmu-gray p-4 transition-colors duration-300 dark:bg-[#0f1117]">
+      <div className="absolute right-4 top-4 z-10">
+        <ThemeToggle />
+      </div>
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-pmu-blue">Student Registration</h1>

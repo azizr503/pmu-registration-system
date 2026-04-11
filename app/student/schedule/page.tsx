@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { getStudentSchedule } from '@/lib/api/student'
 import { getStudentOverview } from '@/lib/api/student'
-import { Loader2, AlertTriangle } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu']
@@ -96,10 +96,16 @@ export default function StudentSchedulePage() {
 
       {data.conflicts.length > 0 && (
         <div className="mb-2 flex flex-wrap gap-2 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800 dark:text-red-100">
-          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <img
+            src="/img/alert-triangle.svg"
+            alt=""
+            className="h-4 w-4 shrink-0 dark:invert"
+            width={16}
+            height={16}
+          />
           <span>
             Conflicts:{' '}
-            {data.conflicts.map(c => `⚠ ${c.courseA} vs ${c.courseB}`).join(' · ')}
+            {data.conflicts.map(c => `${c.courseA} vs ${c.courseB}`).join(' · ')}
           </span>
         </div>
       )}

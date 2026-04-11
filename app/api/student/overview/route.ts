@@ -12,10 +12,16 @@ export async function GET(request: NextRequest) {
     const db = getDb()
     const st = db
       .prepare(
-        `SELECT full_name, gpa, credits_completed, student_id FROM students WHERE user_id = ?`
+        `SELECT full_name, gpa, credits_completed, student_id, major FROM students WHERE user_id = ?`
       )
       .get(user.id) as
-      | { full_name: string; gpa: number; credits_completed: number; student_id: string }
+      | {
+          full_name: string
+          gpa: number
+          credits_completed: number
+          student_id: string
+          major: string | null
+        }
       | undefined
 
     const settings = db
@@ -48,6 +54,7 @@ export async function GET(request: NextRequest) {
       student: {
         name: st?.full_name ?? `${user.firstName} ${user.lastName}`,
         studentId: st?.student_id ?? user.studentId,
+        major: st?.major?.trim() || null,
         gpa: st?.gpa ?? 0,
         creditsCompleted: completed,
         registeredCredits,

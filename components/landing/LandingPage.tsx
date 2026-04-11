@@ -1,8 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Search, Menu } from 'lucide-react'
+import { Menu, Search } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { PmuLogo } from '@/components/pmu-logo'
 
 const NAV = [
   { label: 'ADMISSIONS+AID', href: '#', active: true },
@@ -26,16 +28,20 @@ function SocialIcon({ children, label }: { children: React.ReactNode; label: str
 
 export function LandingPage() {
   return (
-    <div className="flex min-h-screen flex-col bg-[#f5f5f5]">
+    <div className="flex min-h-screen flex-col bg-[#f5f5f5] transition-colors duration-300 dark:bg-[#0f1117]">
       {/* Top utility bar */}
-      <div className="border-b border-black/5 bg-white">
+      <div className="border-b border-black/5 bg-white dark:border-[#2a2d3e] dark:bg-[#1a1d27]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-2 text-sm">
           <div className="flex flex-wrap items-center gap-4">
-            <Link href="/login?role=faculty" className="font-medium text-[#4a5568] hover:text-[#e05a00]">
+            <Link
+              href="/login?role=faculty"
+              className="font-medium text-[#4a5568] hover:text-[#e05a00] dark:text-[#9ca3af] dark:hover:text-[#e05a00]"
+            >
               Faculty+Staff
             </Link>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <SocialIcon label="Twitter">
               <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" aria-hidden>
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -61,14 +67,10 @@ export function LandingPage() {
       </div>
 
       {/* Main header */}
-      <header className="border-b border-black/5 bg-white shadow-sm">
+      <header className="border-b border-black/5 bg-white shadow-sm dark:border-[#2a2d3e] dark:bg-[#1a1d27]">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4">
           <Link href="/" className="flex shrink-0 items-center">
-            <img
-              src="/img/pmulogo.png"
-              alt="PMU"
-              className="h-[60px] max-h-[60px] w-auto max-w-[200px] object-contain object-left"
-            />
+            <PmuLogo size="landing" />
           </Link>
           <nav className="order-3 flex w-full flex-wrap items-center justify-center gap-1 md:order-2 md:w-auto md:justify-end md:gap-0 lg:gap-1">
             {NAV.map(item => (
@@ -77,7 +79,9 @@ export function LandingPage() {
                 href={item.href}
                 className={cn(
                   'px-2 py-2 text-xs font-semibold tracking-wide sm:text-sm',
-                  item.active ? 'text-[#e05a00]' : 'text-[#4a5568] hover:text-[#e05a00]'
+                  item.active
+                    ? 'text-[#e05a00]'
+                    : 'text-[#4a5568] hover:text-[#e05a00] dark:text-[#9ca3af] dark:hover:text-[#e05a00]'
                 )}
               >
                 {item.label}
@@ -85,10 +89,18 @@ export function LandingPage() {
             ))}
           </nav>
           <div className="order-2 flex items-center gap-2 md:order-3">
-            <button type="button" className="rounded-md p-2 text-[#4a5568] hover:bg-black/5" aria-label="Search">
+            <button
+              type="button"
+              className="rounded-md p-2 text-[#4a5568] hover:bg-black/5 dark:text-[#9ca3af] dark:hover:bg-white/10"
+              aria-label="Search"
+            >
               <Search className="h-5 w-5" />
             </button>
-            <button type="button" className="rounded-md p-2 text-[#4a5568] hover:bg-black/5" aria-label="Menu">
+            <button
+              type="button"
+              className="rounded-md p-2 text-[#4a5568] hover:bg-black/5 dark:text-[#9ca3af] dark:hover:bg-white/10"
+              aria-label="Menu"
+            >
               <Menu className="h-5 w-5" />
             </button>
           </div>
@@ -97,13 +109,13 @@ export function LandingPage() {
 
       {/* Hero */}
       <section
-        className="relative border-b border-black/5 bg-[#eceff3]"
+        className="relative border-b border-black/5 bg-[#eceff3] dark:border-[#2a2d3e] dark:bg-[#1a1d27]"
         style={{
           backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 30 Q15 10 30 30 T60 30' fill='none' stroke='%23d1d5db' stroke-width='0.5' opacity='0.5'/%3E%3C/svg%3E")`,
         }}
       >
         <div className="mx-auto max-w-6xl px-4 py-12 text-center md:py-16">
-          <h1 className="text-balance font-sans text-xl font-bold uppercase tracking-[0.12em] text-[#1e2a3a] md:text-2xl lg:text-3xl">
+          <h1 className="text-balance font-sans text-xl font-bold uppercase tracking-[0.12em] text-[#1e2a3a] dark:text-white md:text-2xl lg:text-3xl">
             Login to Banner Self Services
           </h1>
         </div>
@@ -146,7 +158,7 @@ function PortalCard({
   href: string
 }) {
   return (
-    <div className="group flex flex-col overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm transition-shadow duration-200 hover:shadow-lg">
+    <div className="group flex flex-col overflow-hidden rounded-lg border border-black/10 bg-white shadow-sm transition-shadow duration-200 hover:shadow-lg dark:border-[#2a2d3e] dark:bg-[#1e2130]">
       <div className="relative aspect-[16/10] w-full overflow-hidden bg-[#dfe4ea] md:h-[min(360px,45vh)]">
         <img
           src={imageSrc}
@@ -155,10 +167,10 @@ function PortalCard({
         />
       </div>
       <div className="flex flex-1 flex-col items-center px-6 pb-8 pt-6 text-center">
-        <h2 className="text-lg font-semibold text-[#1e2a3a] md:text-xl">{title}</h2>
+        <h2 className="text-lg font-semibold text-[#1e2a3a] dark:text-white md:text-xl">{title}</h2>
         <Link
           href={href}
-          className="mt-5 inline-flex min-w-[160px] items-center justify-center border border-[#1e2a3a] bg-white px-6 py-2.5 text-sm font-medium text-[#1e2a3a] transition-colors hover:bg-[#1e2a3a] hover:text-white"
+          className="mt-5 inline-flex min-w-[160px] items-center justify-center border border-[#1e2a3a] bg-white px-6 py-2.5 text-sm font-medium text-[#1e2a3a] transition-colors hover:bg-[#1e2a3a] hover:text-white dark:border-[#93c5fd] dark:bg-[#1e2130] dark:text-[#93c5fd] dark:hover:bg-[#93c5fd] dark:hover:text-[#0f1117]"
         >
           {buttonLabel}
         </Link>

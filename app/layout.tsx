@@ -21,9 +21,18 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className="light">
-      <body className={`min-h-screen flex flex-col bg-[#f5f5f5] font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <ThemeProvider attribute="class" defaultTheme="light" forcedTheme="light" enableSystem={false} disableTransitionOnChange>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={`min-h-screen flex flex-col bg-[#f5f5f5] font-sans transition-colors duration-300 dark:bg-[#0f1117] ${GeistSans.variable} ${GeistMono.variable}`}
+      >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem={false}
+          storageKey="pmu-theme"
+          themes={['light', 'dark']}
+          disableTransitionOnChange={false}
+        >
           <AuthProvider>
             <Toaster richColors position="top-center" />
             <TopBar />

@@ -53,37 +53,55 @@ export default function FacultyDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-semibold text-[#1a5fb4]">
+        <h1 className="text-xl font-semibold text-[#1a5fb4] dark:text-[#93c5fd]">
           {facultyName} — You have {stats.coursesThisSemester} active courses this semester ({semester})
         </h1>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <Card className="border-t-4 border-t-[#1a5fb4]">
+        <Card className="border border-gray-200 border-t-4 border-t-[#1a5fb4] bg-white dark:border-[#2a2d3e] dark:bg-[#1e2130]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Total Students</CardTitle>
+            <CardTitle className="text-sm text-gray-600 dark:text-[#9ca3af]">Total Students</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4]">
+          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4] dark:text-[#93c5fd]">
             <span>{stats.totalStudents}</span>
-            <span aria-hidden>👥</span>
+            <img
+              src="/img/users.svg"
+              alt=""
+              className="h-7 w-7 shrink-0 dark:invert"
+              width={28}
+              height={28}
+            />
           </CardContent>
         </Card>
-        <Card className="border-t-4 border-t-[#15803d]">
+        <Card className="border border-gray-200 border-t-4 border-t-[#15803d] bg-white dark:border-[#2a2d3e] dark:bg-[#1e2130]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Courses This Semester</CardTitle>
+            <CardTitle className="text-sm text-gray-600 dark:text-[#9ca3af]">Courses This Semester</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4]">
+          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#1a5fb4] dark:text-[#93c5fd]">
             <span>{stats.coursesThisSemester}</span>
-            <span aria-hidden>📚</span>
+            <img
+              src="/img/book-open.svg"
+              alt=""
+              className="h-7 w-7 shrink-0 dark:invert"
+              width={28}
+              height={28}
+            />
           </CardContent>
         </Card>
-        <Card className="border-t-4 border-t-[#e05a00]">
+        <Card className="border border-gray-200 border-t-4 border-t-[#e05a00] bg-white dark:border-[#2a2d3e] dark:bg-[#1e2130]">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Pending Grade Submissions</CardTitle>
+            <CardTitle className="text-sm text-gray-600 dark:text-[#9ca3af]">Pending Grade Submissions</CardTitle>
           </CardHeader>
-          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#e05a00]">
+          <CardContent className="flex items-center justify-between text-2xl font-bold text-[#e05a00] dark:text-orange-400">
             <span>{stats.pendingGradeSubmissions}</span>
-            <span aria-hidden>⏳</span>
+            <img
+              src="/img/clock.svg"
+              alt=""
+              className="h-7 w-7 shrink-0 dark:invert"
+              width={28}
+              height={28}
+            />
           </CardContent>
         </Card>
       </div>

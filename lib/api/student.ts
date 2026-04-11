@@ -12,6 +12,7 @@ export async function getStudentOverview() {
     student: {
       name: string
       studentId: string
+      major: string | null
       gpa: number
       creditsCompleted: number
       registeredCredits: number

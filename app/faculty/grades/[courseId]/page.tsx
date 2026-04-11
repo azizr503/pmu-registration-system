@@ -123,7 +123,18 @@ export default function FacultyGradesPage() {
       <p className="rounded-md bg-[#1a5fb4]/10 px-3 py-2 text-sm text-[#1a5fb4]">
         Weights: Midterm {weights.mid * 100}% · Final {weights.fin * 100}% · Assignments {weights.asg * 100}%
       </p>
-      {locked && <p className="text-sm font-medium text-emerald-700">Grades Submitted ✅</p>}
+      {locked && (
+        <p className="flex items-center gap-2 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+          <img
+            src="/img/check-circle.svg"
+            alt=""
+            className="h-4 w-4 shrink-0 dark:invert"
+            width={16}
+            height={16}
+          />
+          Grades Submitted
+        </p>
+      )}
 
       <div className="overflow-x-auto rounded-lg border">
         <Table>

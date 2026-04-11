@@ -1,8 +1,7 @@
 import OpenAI from 'openai'
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromRequest } from '@/lib/auth'
-import { getDb } from '@/lib/db'
-import { buildStudentChatContext } from '@/lib/student-chat-context'
+import { buildAdminChatContext } from '@/lib/admin-chat-context'
 
 export const runtime = 'nodejs'
 
@@ -17,36 +16,12 @@ export interface ChatRequestBody {
 
 const MODEL = process.env.OPENAI_MODEL || 'gpt-4o-mini'
 
-const STUDENT_SYSTEM_BASE = `You are the PMU Student Registration Assistant for Prince Mohammad Bin Fahd University.
+const ADMIN_SYSTEM_BASE = `You are a PMU admin assistant helping with registration management, enrollment statistics, and user management.
+Be concise and data-driven.
 
-You operate within a controlled academic domain and help students ONLY with registration-related tasks:
+Answer using ONLY the JSON context below as ground truth. Cite specific numbers from the context. If the user asks you to delete users, change the database, or perform actions you cannot do, tell them to use the admin portal UI.
 
-1. Course registration: Help students register for courses by checking:
-   - Prerequisites: student must have completed required courses
-   - Schedule conflicts: no overlapping class times
-   - Credit limit: maximum 18 credits per semester
-   - Seat availability: course must have open seats
-
-2. Actions you can perform:
-   - Register a student for a course (if all validations pass)
-   - Drop a course from student's registration
-   - Suggest alternative sections when conflicts exist
-   - Show available courses without conflicts
-
-3. Information you provide:
-   - Current registered courses and schedule
-   - GPA and academic standing
-   - Prerequisites status for requested courses
-   - Available sections and their timings
-
-4. Boundaries:
-   - You do NOT replace academic advisors
-   - You do NOT make decisions about degree plans
-   - You only handle registration-related queries
-   - Respond in the same language the student uses (Arabic or English)
-
-5. Always be concise, friendly and professional.
-   Do not use markdown formatting. Write in plain conversational text.`
+Important: Do not use markdown formatting like **bold**, bullet points with -, or numbered lists. Write in plain conversational paragraphs instead.`
 
 export async function POST(request: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY?.trim()
@@ -56,8 +31,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const user = await getUserFromRequest(request)
-    if (!user || user.role !== 'student') {
-      return NextResponse.json({ error: 'Student access only' }, { status: 403 })
+    if (!user || user.role !== 'admin') {
+      return NextResponse.json({ error: 'Admin access only' }, { status: 403 })
     }
 
     const body = (await request.json()) as ChatRequestBody
@@ -72,18 +47,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Last message must be from user' }, { status: 400 })
     }
 
-    const db = getDb()
-    const settings = db.prepare(`SELECT semester FROM registration_settings WHERE id = 1`).get() as
-      | { semester: string | null }
-      | undefined
-    const semester = settings?.semester || 'Spring 2026'
+    const context = buildAdminChatContext()
+    const systemContent = `${ADMIN_SYSTEM_BASE}
 
-    const context = buildStudentChatContext(user.id, semester)
-    const systemContent = `${STUDENT_SYSTEM_BASE}
-
-Use ONLY the following JSON context as ground truth for this student. Do not invent courses, grades, seats, or registration data. Guide the student through the PMU registration portal when they need to apply register or drop actions in the system.
-
-Student data context (JSON):
+Admin data context (JSON):
 ${context}`
 
     const client = new OpenAI({ apiKey })
@@ -93,7 +60,7 @@ ${context}`
         { role: 'system', content: systemContent },
         ...messages.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content })),
       ],
-      temperature: 0.4,
+      temperature: 0.35,
       stream: true,
     })
 
@@ -106,7 +73,7 @@ ${context}`
             if (text) controller.enqueue(encoder.encode(text))
           }
         } catch (e) {
-          console.error('Student chat stream error:', e)
+          console.error('Admin chat stream error:', e)
           controller.enqueue(encoder.encode('\n\nUnable to complete the response. Please try again.'))
         } finally {
           controller.close()
@@ -122,7 +89,7 @@ ${context}`
       },
     })
   } catch (error) {
-    console.error('Chat API error:', error)
+    console.error('Admin chat API error:', error)
     return NextResponse.json(
       { error: 'Unable to reach AI service, please try again' },
       { status: 502 }
