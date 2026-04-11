@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Download, Loader2, ToggleLeft, UserPlus } from 'lucide-react'
 import { toast } from 'sonner'
+import { apiUrl } from '@/lib/api-base'
 
 type Stats = {
   totalStudents: number
@@ -28,7 +29,7 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     void (async () => {
-      const r = await fetch('/api/admin/dashboard')
+      const r = await fetch(apiUrl('/admin/dashboard'), { credentials: 'include' })
       const d = await r.json()
       if (r.ok) {
         setStats(d.stats)
@@ -39,7 +40,7 @@ export default function AdminDashboardPage() {
 
   const exportData = async () => {
     try {
-      const r = await fetch('/api/admin/users')
+      const r = await fetch(apiUrl('/admin/users'), { credentials: 'include' })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error)
       const blob = new Blob([JSON.stringify(d.users, null, 2)], { type: 'application/json' })

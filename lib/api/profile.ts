@@ -1,5 +1,7 @@
+import { apiUrl } from '@/lib/api-base'
+
 export async function getProfileApi() {
-  const response = await fetch('/api/profile')
+  const response = await fetch(apiUrl('/profile'), { credentials: 'include' })
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
     const message = (data as { error?: string }).error || 'Failed to load profile'
@@ -11,10 +13,11 @@ export async function getProfileApi() {
 }
 
 export async function updateProfileApi(payload: Record<string, unknown>) {
-  const response = await fetch('/api/profile', {
+  const response = await fetch(apiUrl('/profile'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),
+    credentials: 'include',
   })
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
@@ -22,4 +25,3 @@ export async function updateProfileApi(payload: Record<string, unknown>) {
   }
   return data
 }
-

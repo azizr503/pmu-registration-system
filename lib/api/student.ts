@@ -1,3 +1,5 @@
+import { apiUrl } from '@/lib/api-base'
+
 async function parseOrThrow(response: Response) {
   const data = await response.json().catch(() => ({}))
   if (!response.ok) {
@@ -7,7 +9,7 @@ async function parseOrThrow(response: Response) {
 }
 
 export async function getStudentOverview() {
-  const r = await fetch('/api/student/overview')
+  const r = await fetch(apiUrl('/student/overview'), { credentials: 'include' })
   return parseOrThrow(r) as {
     student: {
       name: string
@@ -25,17 +27,17 @@ export async function getStudentOverview() {
 }
 
 export async function getStudentSections(semester: string, q?: string) {
-  const u = new URL('/api/student/sections', window.location.origin)
+  const u = new URL(apiUrl('/student/sections'))
   u.searchParams.set('semester', semester)
   if (q) u.searchParams.set('q', q)
-  const r = await fetch(u.toString())
+  const r = await fetch(u.toString(), { credentials: 'include' })
   return parseOrThrow(r) as { sections: Record<string, unknown>[] }
 }
 
 export async function getStudentCart(semester: string) {
-  const u = new URL('/api/student/cart', window.location.origin)
+  const u = new URL(apiUrl('/student/cart'))
   u.searchParams.set('semester', semester)
-  const r = await fetch(u.toString())
+  const r = await fetch(u.toString(), { credentials: 'include' })
   return parseOrThrow(r) as {
     items: Record<string, unknown>[]
     totalCredits: number
@@ -45,27 +47,29 @@ export async function getStudentCart(semester: string) {
 }
 
 export async function postStudentCart(sectionId: string, semester: string) {
-  const r = await fetch('/api/student/cart', {
+  const r = await fetch(apiUrl('/student/cart'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ sectionId, semester }),
+    credentials: 'include',
   })
   return r.json()
 }
 
 export async function deleteStudentCart(sectionId: string, semester: string) {
-  const u = new URL('/api/student/cart', window.location.origin)
+  const u = new URL(apiUrl('/student/cart'))
   u.searchParams.set('sectionId', sectionId)
   u.searchParams.set('semester', semester)
-  const r = await fetch(u.toString(), { method: 'DELETE' })
+  const r = await fetch(u.toString(), { method: 'DELETE', credentials: 'include' })
   return parseOrThrow(r)
 }
 
 export async function confirmRegistration(semester: string) {
-  const r = await fetch('/api/student/registration/confirm', {
+  const r = await fetch(apiUrl('/student/registration/confirm'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ semester }),
+    credentials: 'include',
   })
   const data = await r.json().catch(() => ({}))
   if (!r.ok) throw new Error((data as { error?: string }).error || 'Confirm failed')
@@ -73,9 +77,9 @@ export async function confirmRegistration(semester: string) {
 }
 
 export async function getStudentSchedule(semester: string) {
-  const u = new URL('/api/student/schedule', window.location.origin)
+  const u = new URL(apiUrl('/student/schedule'))
   u.searchParams.set('semester', semester)
-  const r = await fetch(u.toString())
+  const r = await fetch(u.toString(), { credentials: 'include' })
   return parseOrThrow(r) as {
     semester: string
     totalCredits: number
@@ -95,15 +99,16 @@ export async function getStudentSchedule(semester: string) {
 }
 
 export async function getStudentGrades() {
-  const r = await fetch('/api/student/grades')
+  const r = await fetch(apiUrl('/student/grades'), { credentials: 'include' })
   return parseOrThrow(r) as Record<string, unknown>
 }
 
 export async function putStudentProfile(body: Record<string, unknown>) {
-  const r = await fetch('/api/student/profile', {
+  const r = await fetch(apiUrl('/student/profile'), {
     method: 'PUT',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
+    credentials: 'include',
   })
   const data = await r.json().catch(() => ({}))
   if (!r.ok) throw new Error((data as { error?: string }).error || 'Save failed')

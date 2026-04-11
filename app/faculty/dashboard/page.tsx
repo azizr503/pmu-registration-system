@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 export default function FacultyDashboardPage() {
   const [data, setData] = useState<Record<string, unknown> | null>(null)
@@ -13,7 +14,7 @@ export default function FacultyDashboardPage() {
   useEffect(() => {
     void (async () => {
       try {
-        const r = await fetch('/api/faculty/overview')
+        const r = await fetch(apiUrl('/faculty/overview'), { credentials: 'include' })
         const d = await r.json()
         if (!r.ok) throw new Error(d.error)
         setData(d)

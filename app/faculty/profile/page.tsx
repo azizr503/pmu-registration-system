@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { useAuth } from '@/lib/auth-context'
 import { toast } from 'sonner'
 import { Camera, Loader2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 export default function FacultyProfilePage() {
   const { refreshUser } = useAuth()
@@ -21,7 +22,7 @@ export default function FacultyProfilePage() {
     office_hours: '',
     phone: '',
     photo_url: '',
-    courses_taught_history: '',
+    courses_history: '',
   })
   const initials = form.full_name
     .split(' ')
@@ -31,7 +32,7 @@ export default function FacultyProfilePage() {
     .join('') || 'AH'
   const teachingHistory = (() => {
     try {
-      const v = JSON.parse(form.courses_taught_history || '[]') as string[]
+      const v = JSON.parse(form.courses_history || '[]') as string[]
       return Array.isArray(v) ? v : []
     } catch {
       return []
@@ -41,7 +42,7 @@ export default function FacultyProfilePage() {
   useEffect(() => {
     void (async () => {
       try {
-        const r = await fetch('/api/faculty/profile')
+        const r = await fetch(apiUrl('/faculty/profile'), { credentials: 'include' })
         const d = await r.json()
         if (!r.ok) throw new Error(d.error)
         const p = d.profile as Record<string, string>
@@ -53,7 +54,7 @@ export default function FacultyProfilePage() {
           office_hours: p.office_hours || '',
           phone: p.phone || '',
           photo_url: p.photo_url || '',
-          courses_taught_history: p.courses_taught_history || '[]',
+          courses_history: p.courses_history || p.courses_taught_history || '[]',
         })
       } catch (e) {
         toast.error(e instanceof Error ? e.message : 'Load failed')
@@ -66,9 +67,10 @@ export default function FacultyProfilePage() {
   const save = async () => {
     setSaving(true)
     try {
-      const r = await fetch('/api/faculty/profile', {
+      const r = await fetch(apiUrl('/faculty/profile'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(form),
       })
       const d = await r.json()

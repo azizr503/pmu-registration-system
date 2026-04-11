@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 export default function FacultyCoursesPage() {
   const [data, setData] = useState<{
@@ -26,7 +27,7 @@ export default function FacultyCoursesPage() {
 
   useEffect(() => {
     void (async () => {
-      const r = await fetch('/api/faculty/courses')
+      const r = await fetch(apiUrl('/faculty/courses'), { credentials: 'include' })
       const d = await r.json()
       if (r.ok) setData(d)
     })()

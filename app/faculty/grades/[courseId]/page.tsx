@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 type Row = {
   studentId: string
@@ -43,7 +44,7 @@ export default function FacultyGradesPage() {
   const load = async () => {
     setLoading(true)
     try {
-      const r = await fetch(`/api/faculty/grades/${sectionId}`)
+      const r = await fetch(apiUrl(`/faculty/grades/${sectionId}`), { credentials: 'include' })
       const d = await r.json()
       if (!r.ok) throw new Error(d.error)
       setRows(d.rows)
@@ -83,9 +84,10 @@ export default function FacultyGradesPage() {
 
   const save = async (action: 'draft' | 'final') => {
     try {
-      const r = await fetch(`/api/faculty/grades/${sectionId}`, {
+      const r = await fetch(apiUrl(`/faculty/grades/${sectionId}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           action,
           grades: rows.map(r => ({

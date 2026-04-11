@@ -1,0 +1,67 @@
+{
+  "courses": [
+    {
+      "id": "c-math101",
+      "code": "MATH101",
+      "title": "Calculus I",
+      "credits": 3,
+      "department": "Mathematics",
+      "description": "Intro calculus",
+      "prerequisites": "[]"
+    },
+    {
+      "id": "c-cs101",
+      "code": "CS101",
+      "title": "Programming I",
+      "credits": 3,
+      "department": "Computer Science",
+      "description": "Intro programming",
+      "prerequisites": "[]"
+    },
+    {
+      "id": "c-cs201",
+      "code": "CS201",
+      "title": "Data Structures",
+      "credits": 3,
+      "department": "Computer Science",
+      "description": "DS",
+      "prerequisites": "[\"CS101\"]"
+    },
+    {
+      "id": "c-cs301",
+      "code": "CS301",
+      "title": "Operating Systems",
+      "credits": 3,
+      "department": "Computer Science",
+      "description": "OS",
+      "prerequisites": "[\"CS201\"]"
+    },
+    {
+      "id": "c-cs401",
+      "code": "CS401",
+      "title": "Software Engineering",
+      "credits": 3,
+      "department": "Computer Science",
+      "description": "SE",
+      "prerequisites": "[\"CS301\"]"
+    },
+    {
+      "id": "c-math201",
+      "code": "MATH201",
+      "title": "Calculus II",
+      "credits": 3,
+      "department": "Mathematics",
+      "description": "Calculus II",
+      "prerequisites": "[\"MATH101\"]"
+    },
+    {
+      "id": "c-eng101",
+      "code": "ENG101",
+      "title": "English Composition",
+      "credits": 3,
+      "department": "English",
+      "description": "Writing",
+      "prerequisites": "[]"
+    }
+  ]
+}

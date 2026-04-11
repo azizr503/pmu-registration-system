@@ -9,6 +9,7 @@ import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { toast } from 'sonner'
 import { Loader2 } from 'lucide-react'
+import { apiUrl } from '@/lib/api-base'
 
 type Analytics = {
   semester: string
@@ -29,7 +30,7 @@ export default function AdminRegistrationControlPage() {
   const [analytics, setAnalytics] = useState<Analytics | null>(null)
 
   const load = async () => {
-    const r = await fetch('/api/admin/registration')
+    const r = await fetch(apiUrl('/admin/registration'), { credentials: 'include' })
     const d = await r.json()
     if (!r.ok) throw new Error(d.error)
     const s = d.settings as {
@@ -65,9 +66,10 @@ export default function AdminRegistrationControlPage() {
 
   const save = async () => {
     try {
-      const r = await fetch('/api/admin/registration', {
+      const r = await fetch(apiUrl('/admin/registration'), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({
           semester: form.semester,
           is_open: form.is_open,

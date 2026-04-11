@@ -1,0 +1,126 @@
+{
+  "users": [
+    {
+      "id": "u-admin",
+      "email": "admin@pmu.edu.sa",
+      "password_hash": "$2b$10$Tp.h4Ccd1dmdPIAm9./IMuu0qz23yDVXw9bEeBVg753W2a0mzqlPK",
+      "role": "admin",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "last_login": null
+    },
+    {
+      "id": "u-s1",
+      "email": "s.202012345@pmu.edu.sa",
+      "password_hash": "$2b$10$1zN80/E6YAwLVRqvqY.YUe9o3Xvi036N5AKuR5VVU38ldtvDPniWu",
+      "role": "student",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "last_login": null
+    },
+    {
+      "id": "u-s2",
+      "email": "s.202012346@pmu.edu.sa",
+      "password_hash": "$2b$10$1zN80/E6YAwLVRqvqY.YUe9o3Xvi036N5AKuR5VVU38ldtvDPniWu",
+      "role": "student",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "last_login": null
+    },
+    {
+      "id": "u-s3",
+      "email": "s.202012347@pmu.edu.sa",
+      "password_hash": "$2b$10$1zN80/E6YAwLVRqvqY.YUe9o3Xvi036N5AKuR5VVU38ldtvDPniWu",
+      "role": "student",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "last_login": null
+    },
+    {
+      "id": "u-f1",
+      "email": "f.100001@pmu.edu.sa",
+      "password_hash": "$2b$10$7l49bZe7ocZ/O21lQf1g8uGq.dSyNV146U/.01UV5kfE7h2Mfi4T6",
+      "role": "faculty",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "last_login": null
+    },
+    {
+      "id": "u-f2",
+      "email": "f.100002@pmu.edu.sa",
+      "password_hash": "$2b$10$7l49bZe7ocZ/O21lQf1g8uGq.dSyNV146U/.01UV5kfE7h2Mfi4T6",
+      "role": "faculty",
+      "status": "active",
+      "created_at": "2025-01-01T00:00:00.000Z",
+      "last_login": null
+    }
+  ],
+  "students": [
+    {
+      "user_id": "u-s1",
+      "student_id": "202012345",
+      "full_name": "Abdulaziz Alrumaih",
+      "major": "Computer Science",
+      "minor": "",
+      "level": "Junior",
+      "gpa": 3.4,
+      "credits_completed": 66,
+      "advisor_id": "u-f1",
+      "phone": "+966500000001",
+      "emergency_contact": "Parent +966500000099",
+      "profile_completed": 1
+    },
+    {
+      "user_id": "u-s2",
+      "student_id": "202012346",
+      "full_name": "Abdullah Almosharef",
+      "major": "Computer Science",
+      "minor": "",
+      "level": "Junior",
+      "gpa": 3.2,
+      "credits_completed": 60,
+      "advisor_id": "u-f1",
+      "phone": "+966500000002",
+      "emergency_contact": "",
+      "profile_completed": 1
+    },
+    {
+      "user_id": "u-s3",
+      "student_id": "202012347",
+      "full_name": "Rakan Almutairi",
+      "major": "Computer Science",
+      "minor": "",
+      "level": "Sophomore",
+      "gpa": 3.0,
+      "credits_completed": 45,
+      "advisor_id": "u-f1",
+      "phone": "",
+      "emergency_contact": "",
+      "profile_completed": 0
+    }
+  ],
+  "faculty": [
+    {
+      "user_id": "u-f1",
+      "faculty_id": "100001",
+      "full_name": "Dr. Ahmed Hassan",
+      "department": "Computer Science",
+      "office_location": "Building 3, Room 210",
+      "office_hours": "Sun–Thu 12:00–14:00",
+      "phone": "+966500000010",
+      "photo_url": "",
+      "courses_history": "[\"CS101\",\"CS201\"]"
+    },
+    {
+      "user_id": "u-f2",
+      "faculty_id": "100002",
+      "full_name": "Dr. Sara Al-Qahtani",
+      "department": "Mathematics",
+      "office_location": "Building 2, Room 105",
+      "office_hours": "Mon/Wed 10:00–12:00",
+      "phone": "+966500000011",
+      "photo_url": "",
+      "courses_history": "[\"MATH201\"]"
+    }
+  ]
+}
