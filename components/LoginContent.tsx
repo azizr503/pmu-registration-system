@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Loader2, Mail, Lock } from 'lucide-react'
+import { Loader2, Lock, Mail } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
+import { PmuLogo } from '@/components/pmu-logo'
 import { getPostLoginPath } from '@/lib/constants/navigation'
 import { normalizePmuEmail } from '@/lib/email-normalize'
 
@@ -58,14 +60,15 @@ export default function LoginContent() {
   }
 
   return (
-    <div className="min-h-screen w-full bg-[radial-gradient(circle_at_20%_20%,#ffffff_0%,#f0f2f5_45%,#e8edf5_100%)] text-[#1e2a3a]">
+    <div className="relative min-h-screen w-full bg-[radial-gradient(circle_at_20%_20%,#ffffff_0%,#f0f2f5_45%,#e8edf5_100%)] text-[#1e2a3a] transition-colors duration-300 dark:bg-[#0f1117] dark:text-white">
+      <div className="absolute right-4 top-4 z-10">
+        <ThemeToggle />
+      </div>
       <div className="mx-auto flex min-h-screen w-full max-w-lg flex-col justify-center px-4 py-8 sm:px-6">
         <div className="page-fade-in mb-6 text-center">
-          <img
-            src="/img/pmulogo.png"
-            alt="Prince Mohammad Bin Fahd University"
-            className="mx-auto mb-5 h-auto max-h-[80px] w-auto max-w-[260px] object-contain"
-          />
+          <div className="mb-5 flex justify-center">
+            <PmuLogo size="hero" alt="Prince Mohammad Bin Fahd University" />
+          </div>
           <h1 className="text-xl font-semibold text-[#1a5fb4] sm:text-2xl">Welcome Back</h1>
           <p className="mt-2 text-sm text-[#4a5568] sm:text-base">{signInHeadline}</p>
         </div>

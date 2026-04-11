@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { MessageCircle, AlertCircle } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -505,7 +504,7 @@ export function AIChatbot() {
           const planSummary = plans
             .map(
               (plan) =>
-                `**${plan.label}** (${plan.totalCredits} credits)\n${plan.description}\n\nCourses:\n${plan.courses
+                `${plan.label} (${plan.totalCredits} credits)\n${plan.description}\n\nCourses:\n${plan.courses
                   .map((c) => `• ${c.code} - ${c.title} (${c.credits} credits)\n  ${c.sectionId} | ${c.meetingTime} | ${c.instructor}`)
                   .join("\n")}`
             )
@@ -563,7 +562,7 @@ export function AIChatbot() {
           const confirmMessage: ChatMessage = {
             id: Date.now().toString(),
             role: "assistant",
-            content: `You chose **${selectedPlan.label}**. This includes:\n\n${courseList}\n\n**Total Credits:** ${selectedPlan.totalCredits}\n\nDo you want me to register these courses for you?`,
+            content: `You chose ${selectedPlan.label}. This includes:\n\n${courseList}\n\nTotal credits: ${selectedPlan.totalCredits}\n\nDo you want me to register these courses for you?`,
             timestamp: new Date(),
             meta: { flow: "CONFIRM_REGISTRATION", planId },
             options: [
@@ -762,7 +761,7 @@ export function AIChatbot() {
           const impactMessage: ChatMessage = {
             id: Date.now().toString(),
             role: "assistant",
-            content: `**Impact of dropping ${impact.courseCode} - ${impact.courseTitle}:**\n\n**Before:**\n• Credits: ${impact.beforeCredits}/${progress.requiredCredits}\n• Progress: ${impact.beforeProgress}%\n\n**After:**\n• Credits: ${impact.afterCredits}/${progress.requiredCredits}\n• Progress: ${impact.afterProgress}%\n\n**Change:** -${impact.credits} credits, -${impact.beforeProgress - impact.afterProgress}% progress\n\n**Affected Requirements:** ${impact.affectedRequirements.join(", ")}\n\nDo you want to proceed with dropping this course?`,
+            content: `Impact of dropping ${impact.courseCode} - ${impact.courseTitle}:\n\nBefore:\n• Credits: ${impact.beforeCredits}/${progress.requiredCredits}\n• Progress: ${impact.beforeProgress}%\n\nAfter:\n• Credits: ${impact.afterCredits}/${progress.requiredCredits}\n• Progress: ${impact.afterProgress}%\n\nChange: minus ${impact.credits} credits, minus ${impact.beforeProgress - impact.afterProgress} percentage points progress.\n\nAffected requirements: ${impact.affectedRequirements.join(", ")}\n\nDo you want to proceed with dropping this course?`,
             timestamp: new Date(),
             meta: { flow: "CONFIRM_DROP", courseId },
             options: [
@@ -979,7 +978,13 @@ export function AIChatbot() {
           size="icon"
           aria-label="Open chat assistant"
         >
-          <MessageCircle className="h-6 w-6 sm:h-7 sm:w-7" />
+          <img
+            src="/img/message-circle.svg"
+            alt=""
+            className="h-6 w-6 shrink-0 brightness-0 invert sm:h-7 sm:w-7"
+            width={28}
+            height={28}
+          />
         </Button>
       )}
 
@@ -1020,7 +1025,13 @@ export function AIChatbot() {
             {/* Error Alert */}
             {error && (
               <Alert variant="destructive" className="m-4 shrink-0">
-                <AlertCircle className="h-4 w-4" />
+                <img
+                  src="/img/alert-triangle.svg"
+                  alt=""
+                  className="h-4 w-4 shrink-0 dark:invert"
+                  width={16}
+                  height={16}
+                />
                 <AlertDescription className="text-sm">{error}</AlertDescription>
               </Alert>
             )}

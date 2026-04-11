@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
+import { PmuLogo } from '@/components/pmu-logo'
+import { chatApiErrorMessage, readChatStream } from '@/lib/chat-stream-client'
+import { ChatMessageBody } from '@/components/chat-message-body'
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
@@ -47,13 +50,27 @@ export default function StudentChatbotPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: next }),
       })
-      const data = await res.json().catch(() => ({}))
       if (!res.ok) {
-        throw new Error((data as { error?: string }).error || 'Chat failed')
+        const data = (await res.json().catch(() => ({}))) as { error?: string }
+        toast.error(chatApiErrorMessage(res, data))
+        return
       }
-      setMessages(m => [...m, { role: 'assistant', content: (data as { message: string }).message }])
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Error')
+      setMessages(m => [...m, { role: 'assistant', content: '' }])
+      await readChatStream(
+        res,
+        chunk =>
+          setMessages(m => {
+            const copy = [...m]
+            const last = copy[copy.length - 1]
+            if (last?.role === 'assistant') {
+              copy[copy.length - 1] = { role: 'assistant', content: last.content + chunk }
+            }
+            return copy
+          }),
+        () => setLoading(false)
+      )
+    } catch {
+      toast.error('Unable to reach AI service, please try again')
     } finally {
       setLoading(false)
     }
@@ -77,7 +94,7 @@ export default function StudentChatbotPage() {
 
       <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-border bg-white shadow-sm">
         <div className="flex items-center gap-3 border-b border-border px-4 py-3">
-          <img src="/img/pmulogo.png" alt="PMU" className="h-9 w-9 rounded-full border border-border object-contain" />
+          <PmuLogo size="compact" />
           <div>
             <p className="font-semibold text-[#1a5fb4]">PMU AI Assistant</p>
             <p className="text-xs text-muted-foreground">Registration & academic help</p>
@@ -101,17 +118,18 @@ export default function StudentChatbotPage() {
                       : 'bg-muted text-foreground'
                   }`}
                 >
-                  <p className="whitespace-pre-wrap">{m.content}</p>
+                  <ChatMessageBody content={m.content} variant={m.role === 'user' ? 'user' : 'assistant'} />
                 </div>
               </div>
             ))}
             {loading && (
               <div className="flex justify-start">
-                <div className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
+                <div className="inline-flex items-center gap-2 rounded-full bg-muted px-3 py-1.5 text-xs text-muted-foreground">
+                  <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#1a5fb4]" />
                   <span className="h-2 w-2 animate-bounce rounded-full bg-[#1a5fb4]" />
                   <span className="h-2 w-2 animate-bounce rounded-full bg-[#1a5fb4] [animation-delay:120ms]" />
                   <span className="h-2 w-2 animate-bounce rounded-full bg-[#1a5fb4] [animation-delay:240ms]" />
-                  <span className="ml-1">Thinking...</span>
+                  <span>Thinking...</span>
                 </div>
               </div>
             )}

@@ -1,6 +1,6 @@
 "use client"
 
-import { Menu, User, ChevronLeft, ChevronRight, LogOut, Settings } from "lucide-react"
+import { Menu, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
@@ -86,18 +86,18 @@ export function Header({ onMenuClick, onToggleCollapse, isCollapsed }: HeaderPro
                 </div>
                 <DropdownMenuItem asChild>
                   <Link href="/profile" className="cursor-pointer">
-                    <User className="mr-2 h-4 w-4" />
+                    <img src="/img/user.svg" alt="" className="mr-2 h-4 w-4 shrink-0 dark:invert" width={16} height={16} />
                     Profile
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
                   <Link href="/admin" className="cursor-pointer">
-                    <Settings className="mr-2 h-4 w-4" />
+                    <img src="/img/settings.svg" alt="" className="mr-2 h-4 w-4 shrink-0 dark:invert" width={16} height={16} />
                     Admin Dashboard
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
+                  <img src="/img/logout.svg" alt="" className="mr-2 h-4 w-4 shrink-0 dark:invert" width={16} height={16} />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
+import { ChatMessageBody } from "@/components/chat-message-body"
 
 interface ChatBubbleProps {
   message: string
@@ -20,14 +21,14 @@ export function ChatBubble({ message, isUser, timestamp, className }: ChatBubble
     >
       <div
         className={cn(
-          "max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-line",
+          "max-w-[85%] sm:max-w-[75%] rounded-2xl px-4 py-3 text-sm leading-relaxed",
           "shadow-sm transition-all",
           isUser
             ? "bg-pmu-blue text-pmu-white rounded-br-sm"
             : "bg-card border border-border text-foreground rounded-bl-sm"
         )}
       >
-        <p className="break-words">{message}</p>
+        <ChatMessageBody content={message} variant={isUser ? "user" : "assistant"} />
         {timestamp && (
           <p
             className={cn(

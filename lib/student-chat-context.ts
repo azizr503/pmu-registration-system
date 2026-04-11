@@ -10,12 +10,22 @@ export function buildStudentChatContext(userId: string, semester: string): strin
   const regs = listStudentSectionsForSemester(db, userId, semester, ['registered', 'cart'])
   const grades = db
     .prepare(
-      `SELECT c.code, g.letter_grade, s.semester FROM grades g
+      `SELECT c.code, c.title, c.credits, g.letter_grade, g.override_grade, g.calculated_grade, s.semester
+       FROM grades g
        JOIN sections s ON s.id = g.section_id
        JOIN courses c ON c.id = s.course_id
-       WHERE g.user_id = ? AND g.is_final = 1`
+       WHERE g.user_id = ? AND g.is_final = 1
+       ORDER BY s.semester DESC, c.code`
     )
-    .all(userId) as { code: string; letter_grade: string | null; semester: string }[]
+    .all(userId) as {
+      code: string
+      title: string
+      credits: number
+      letter_grade: string | null
+      override_grade: string | null
+      calculated_grade: number | null
+      semester: string
+    }[]
 
   return JSON.stringify(
     {
@@ -28,7 +38,14 @@ export function buildStudentChatContext(userId: string, semester: string): strin
         days: r.days,
         time: `${r.start_time}-${r.end_time}`,
       })),
-      completedGrades: grades,
+      completedGrades: grades.map(g => ({
+        code: g.code,
+        title: g.title,
+        credits: g.credits,
+        semester: g.semester,
+        letterGrade: g.override_grade || g.letter_grade,
+        numericGrade: g.calculated_grade,
+      })),
     },
     null,
     2
