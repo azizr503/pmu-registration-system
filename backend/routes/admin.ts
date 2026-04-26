@@ -1,9 +1,11 @@
 import { randomBytes, randomUUID } from 'crypto'
 import { Router } from 'express'
-import { hashPassword, inferRoleFromEmail, isValidPMUEmail } from '@/lib/auth'
+import { hashPassword, inferRoleFromEmail, isValidPMUEmail, verifyPassword } from '@/lib/auth'
 import type { UserStatus } from '@/types/auth'
 import { requireAuth, requireRole } from '../middleware/auth'
 import { getDb } from '../db'
+import multer from 'multer'
+import XLSX from 'xlsx'
 
 function generateTempPassword(length = 14): string {
   const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -16,6 +18,167 @@ function generateTempPassword(length = 14): string {
 export const adminRouter = Router()
 adminRouter.use(requireAuth)
 adminRouter.use(requireRole('admin'))
+
+const importUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 },
+})
+
+type StudentImportRow = {
+  id: string
+  name: string
+  email: string
+  major: string
+  password: string
+}
+
+type FacultyImportRow = {
+  id: string
+  name: string
+  email: string
+  department: string
+  password: string
+}
+
+function normalizeHeader(s: string): string {
+  return s.trim().toLowerCase().replace(/\s+/g, '_')
+}
+
+function isValidImportFilename(name: string): boolean {
+  const x = name.toLowerCase()
+  return x.endsWith('.xlsx') || x.endsWith('.xls') || x.endsWith('.csv')
+}
+
+function parseImportSheet(fileBuffer: Buffer): Record<string, unknown>[] {
+  const wb = XLSX.read(fileBuffer, { type: 'buffer' })
+  const first = wb.SheetNames[0]
+  if (!first) return []
+  const ws = wb.Sheets[first]
+  return XLSX.utils.sheet_to_json<Record<string, unknown>>(ws, { defval: '' })
+}
+
+function detectImportType(rows: Record<string, unknown>[]): 'students' | 'faculty' | null {
+  if (rows.length === 0) return null
+  const keys = new Set(Object.keys(rows[0]!).map(normalizeHeader))
+  const studentCols = ['id', 'name', 'email', 'major', 'password']
+  const facultyCols = ['id', 'name', 'email', 'department', 'password']
+  if (studentCols.every(k => keys.has(k))) return 'students'
+  if (facultyCols.every(k => keys.has(k))) return 'faculty'
+  return null
+}
+
+function valueByHeader<T extends string>(row: Record<string, unknown>, header: T): string {
+  for (const [k, v] of Object.entries(row)) {
+    if (normalizeHeader(k) === header) return String(v ?? '').trim()
+  }
+  return ''
+}
+
+adminRouter.post('/import/analyze', importUpload.single('file'), (req, res) => {
+  try {
+    const file = req.file
+    if (!file) return res.status(400).json({ error: 'File is required' })
+    if (!isValidImportFilename(file.originalname)) {
+      return res.status(400).json({ error: 'Only .xlsx, .xls, and .csv files are supported' })
+    }
+
+    const rawRows = parseImportSheet(file.buffer)
+    if (rawRows.length === 0) {
+      return res.status(400).json({ error: 'The uploaded file is empty' })
+    }
+
+    const forcedTypeRaw = String(req.body?.forced_type || req.query?.forced_type || '').toLowerCase()
+    const forcedType = forcedTypeRaw === 'students' || forcedTypeRaw === 'faculty' ? forcedTypeRaw : null
+
+    const type = forcedType || detectImportType(rawRows)
+    if (!type) {
+      return res.status(400).json({
+        error:
+          'Could not detect file type. Student file must include: id, name, email, major, password. Faculty file must include: id, name, email, department, password.',
+      })
+    }
+
+    const db = getDb()
+    if (type === 'students') {
+      const rows: StudentImportRow[] = rawRows.map(r => ({
+        id: valueByHeader(r, 'id'),
+        name: valueByHeader(r, 'name'),
+        email: valueByHeader(r, 'email').toLowerCase(),
+        major: valueByHeader(r, 'major') || 'Computer Science',
+        password: valueByHeader(r, 'password'),
+      }))
+      const existingStudentIds = (
+        db.prepare(`SELECT student_id FROM students WHERE student_id IS NOT NULL`).all() as { student_id: string }[]
+      ).map(r => r.student_id.toLowerCase())
+      const existingEmails = (db.prepare(`SELECT email FROM users`).all() as { email: string }[]).map(r =>
+        r.email.toLowerCase()
+      )
+      return res.json({
+        ok: true,
+        type,
+        rows,
+        existing: { existingIds: existingStudentIds, existingEmails },
+      })
+    }
+
+    const rows: FacultyImportRow[] = rawRows.map(r => ({
+      id: valueByHeader(r, 'id'),
+      name: valueByHeader(r, 'name'),
+      email: valueByHeader(r, 'email').toLowerCase(),
+      department: valueByHeader(r, 'department') || 'Computer Science',
+      password: valueByHeader(r, 'password'),
+    }))
+    const existingFacultyIds = (
+      db.prepare(`SELECT faculty_id FROM faculty WHERE faculty_id IS NOT NULL`).all() as { faculty_id: string }[]
+    ).map(r => r.faculty_id.toLowerCase())
+    const existingEmails = (db.prepare(`SELECT email FROM users`).all() as { email: string }[]).map(r =>
+      r.email.toLowerCase()
+    )
+    return res.json({
+      ok: true,
+      type,
+      rows,
+      existing: { existingIds: existingFacultyIds, existingEmails },
+    })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).json({ error: 'Server error' })
+  }
+})
+
+type UserDeleteTarget = {
+  id: string
+  role: string
+}
+
+function deleteUserById(db: ReturnType<typeof getDb>, target: UserDeleteTarget, actingAdminId: string) {
+  if (target.id === actingAdminId) {
+    return { ok: false as const, status: 400, error: 'You cannot delete your own account.' }
+  }
+
+  if (target.role === 'admin') {
+    const adminCount = (db.prepare(`SELECT COUNT(*) as c FROM users WHERE role = 'admin'`).get() as { c: number }).c
+    if (adminCount <= 1) {
+      return { ok: false as const, status: 400, error: 'Cannot delete the last administrator account.' }
+    }
+  }
+
+  const run = db.transaction(() => {
+    db.prepare(`UPDATE students SET advisor_id = NULL WHERE advisor_id = ?`).run(target.id)
+    db.prepare(`UPDATE sections SET faculty_id = NULL WHERE faculty_id = ?`).run(target.id)
+    db.prepare(`UPDATE announcements SET created_by = NULL WHERE created_by = ?`).run(target.id)
+    db.prepare(`UPDATE eform_requests SET reviewed_by = NULL WHERE reviewed_by = ?`).run(target.id)
+    db.prepare(`DELETE FROM grades WHERE student_id = ?`).run(target.id)
+    db.prepare(`DELETE FROM registrations WHERE student_id = ?`).run(target.id)
+    db.prepare(`DELETE FROM eform_requests WHERE student_id = ?`).run(target.id)
+    db.prepare(`DELETE FROM students WHERE user_id = ?`).run(target.id)
+    db.prepare(`DELETE FROM faculty WHERE user_id = ?`).run(target.id)
+    db.prepare(`DELETE FROM users WHERE id = ?`).run(target.id)
+  })
+  run()
+
+  return { ok: true as const }
+}
 
 adminRouter.get('/users', (_req, res) => {
   try {
@@ -356,9 +519,6 @@ adminRouter.delete('/users/:id', (req, res) => {
   try {
     const admin = req.authUser!
     const { id } = req.params
-    if (id === admin.id) {
-      return res.status(400).json({ error: 'You cannot delete your own account.' })
-    }
 
     const db = getDb()
     const row = db.prepare(`SELECT id, role FROM users WHERE id = ?`).get(id) as
@@ -368,27 +528,206 @@ adminRouter.delete('/users/:id', (req, res) => {
       return res.status(404).json({ error: 'Not found' })
     }
 
-    if (row.role === 'admin') {
-      const adminCount = (db.prepare(`SELECT COUNT(*) as c FROM users WHERE role = 'admin'`).get() as { c: number })
-        .c
-      if (adminCount <= 1) {
-        return res.status(400).json({ error: 'Cannot delete the last administrator account.' })
-      }
+    const deleted = deleteUserById(db, row, admin.id)
+    if (!deleted.ok) {
+      return res.status(deleted.status).json({ error: deleted.error })
     }
 
-    const run = db.transaction(() => {
-      db.prepare(`UPDATE students SET advisor_id = NULL WHERE advisor_id = ?`).run(id)
-      db.prepare(`DELETE FROM grades WHERE student_id = ?`).run(id)
-      db.prepare(`DELETE FROM registrations WHERE student_id = ?`).run(id)
-      db.prepare(`UPDATE sections SET faculty_id = NULL WHERE faculty_id = ?`).run(id)
-      db.prepare(`DELETE FROM students WHERE user_id = ?`).run(id)
-      db.prepare(`DELETE FROM faculty WHERE user_id = ?`).run(id)
-      db.prepare(`UPDATE announcements SET created_by = NULL WHERE created_by = ?`).run(id)
-      db.prepare(`DELETE FROM users WHERE id = ?`).run(id)
-    })
-    run()
-
     return res.json({ ok: true })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).json({ error: 'Server error' })
+  }
+})
+
+adminRouter.delete('/ai-actions', async (req, res) => {
+  try {
+    const admin = req.authUser!
+    const body = req.body || {}
+    const actionType = String(body.action_type || '')
+    const targetUserId = String(body.target_user_id || '')
+    const adminPassword = String(body.admin_password || '')
+    const targetUserName = String(body.target_user_name || '').trim()
+
+    if (actionType !== 'delete_user') {
+      return res.status(400).json({ error: 'Unsupported action type' })
+    }
+    if (!targetUserId) {
+      return res.status(400).json({ error: 'Target user ID is required' })
+    }
+    if (!adminPassword) {
+      return res.status(400).json({ error: 'Admin password is required' })
+    }
+
+    const db = getDb()
+    const adminCred = db.prepare(`SELECT password_hash FROM users WHERE id = ?`).get(admin.id) as
+      | { password_hash: string }
+      | undefined
+    if (!adminCred) {
+      return res.status(401).json({ error: 'Not authenticated' })
+    }
+
+    const passOk = await verifyPassword(adminPassword, adminCred.password_hash)
+    if (!passOk) {
+      return res.status(403).json({ error: 'Incorrect password' })
+    }
+
+    const row = db.prepare(`SELECT id, role FROM users WHERE id = ?`).get(targetUserId) as
+      | { id: string; role: string }
+      | undefined
+    if (!row) {
+      return res.status(404).json({ error: 'User not found' })
+    }
+
+    const deleted = deleteUserById(db, row, admin.id)
+    if (!deleted.ok) {
+      return res.status(deleted.status).json({ error: deleted.error })
+    }
+
+    return res.json({
+      ok: true,
+      message: `User ${targetUserName || targetUserId} has been deleted successfully`,
+    })
+  } catch (e) {
+    console.error(e)
+    return res.status(500).json({ error: 'Server error' })
+  }
+})
+
+adminRouter.post('/import/execute', async (req, res) => {
+  try {
+    const admin = req.authUser!
+    const body = req.body || {}
+    const type = String(body.type || '') as 'students' | 'faculty'
+    const adminPassword = String(body.adminPassword || '')
+    const data = Array.isArray(body.data) ? (body.data as Record<string, unknown>[]) : []
+
+    if (type !== 'students' && type !== 'faculty') {
+      return res.status(400).json({ error: 'Invalid import type' })
+    }
+    if (!adminPassword) {
+      return res.status(400).json({ error: 'Admin password is required' })
+    }
+
+    const db = getDb()
+    const adminCred = db.prepare(`SELECT password_hash FROM users WHERE id = ?`).get(admin.id) as
+      | { password_hash: string }
+      | undefined
+    if (!adminCred) return res.status(401).json({ error: 'Not authenticated' })
+
+    const passOk = await verifyPassword(adminPassword, adminCred.password_hash)
+    if (!passOk) return res.status(403).json({ error: 'Incorrect password' })
+
+    let imported = 0
+    let skipped = 0
+
+    if (type === 'students') {
+      const seenIds = new Set<string>()
+      const seenEmails = new Set<string>()
+      for (const row of data) {
+        const id = String(row.id || '').trim()
+        const name = String(row.name || '').trim()
+        const email = String(row.email || '').trim().toLowerCase()
+        const major = String(row.major || 'Computer Science').trim() || 'Computer Science'
+        const passwordRaw = String(row.password || '').trim()
+
+        const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+        if (!id || !name || !email || !passwordRaw || !emailOk) {
+          skipped++
+          continue
+        }
+        if (seenIds.has(id.toLowerCase()) || seenEmails.has(email)) {
+          skipped++
+          continue
+        }
+        seenIds.add(id.toLowerCase())
+        seenEmails.add(email)
+
+        const existsStudent = db.prepare(`SELECT user_id FROM students WHERE lower(student_id) = lower(?)`).get(id) as
+          | { user_id: string }
+          | undefined
+        const existsEmail = db.prepare(`SELECT id FROM users WHERE lower(email) = lower(?)`).get(email) as
+          | { id: string }
+          | undefined
+        if (existsStudent || existsEmail) {
+          skipped++
+          continue
+        }
+
+        const userId = randomUUID()
+        const hashed = await hashPassword(passwordRaw)
+        const run = db.transaction(() => {
+          db.prepare(
+            `INSERT INTO users (id, email, password_hash, role, status, created_at, last_login)
+             VALUES (?, ?, ?, 'student', 'active', ?, NULL)`
+          ).run(userId, email, hashed, new Date().toISOString())
+          db.prepare(
+            `INSERT INTO students (user_id, student_id, full_name, major, minor, level, gpa, credits_completed, advisor_id, phone, emergency_contact, profile_completed)
+             VALUES (?, ?, ?, ?, '', 'Freshman', 0, 0, NULL, '', '', 1)`
+          ).run(userId, id, name, major)
+        })
+        try {
+          run()
+          imported++
+        } catch {
+          skipped++
+        }
+      }
+      return res.json({ ok: true, imported, skipped })
+    }
+
+    const seenIds = new Set<string>()
+    const seenEmails = new Set<string>()
+    for (const row of data) {
+      const facultyId = String(row.id || '').trim()
+      const name = String(row.name || '').trim()
+      const email = String(row.email || '').trim().toLowerCase()
+      const department = String(row.department || 'Computer Science').trim() || 'Computer Science'
+      const passwordRaw = String(row.password || '').trim()
+      const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+
+      if (!facultyId || !name || !email || !passwordRaw || !emailOk) {
+        skipped++
+        continue
+      }
+      if (seenIds.has(facultyId.toLowerCase()) || seenEmails.has(email)) {
+        skipped++
+        continue
+      }
+      seenIds.add(facultyId.toLowerCase())
+      seenEmails.add(email)
+
+      const existsFaculty = db.prepare(`SELECT user_id FROM faculty WHERE lower(faculty_id) = lower(?)`).get(facultyId) as
+        | { user_id: string }
+        | undefined
+      const existsEmail = db.prepare(`SELECT id FROM users WHERE lower(email) = lower(?)`).get(email) as
+        | { id: string }
+        | undefined
+      if (existsFaculty || existsEmail) {
+        skipped++
+        continue
+      }
+
+      try {
+        const userId = randomUUID()
+        const hashed = await hashPassword(passwordRaw)
+        const run = db.transaction(() => {
+          db.prepare(
+            `INSERT INTO users (id, email, password_hash, role, status, created_at, last_login)
+             VALUES (?, ?, ?, 'faculty', 'active', ?, NULL)`
+          ).run(userId, email, hashed, new Date().toISOString())
+          db.prepare(
+            `INSERT INTO faculty (user_id, faculty_id, full_name, department, office_location, office_hours, phone, photo_url, courses_history)
+             VALUES (?, ?, ?, ?, '', '', '', '', '[]')`
+          ).run(userId, facultyId, name, department)
+        })
+        run()
+        imported++
+      } catch {
+        skipped++
+      }
+    }
+    return res.json({ ok: true, imported, skipped })
   } catch (e) {
     console.error(e)
     return res.status(500).json({ error: 'Server error' })

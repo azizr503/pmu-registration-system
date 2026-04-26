@@ -3,14 +3,16 @@ import path from 'path'
 import Database from 'better-sqlite3'
 import bcrypt from 'bcrypt'
 
-export const PMU_DB_PATH = path.join(process.cwd(), 'data', 'pmu.db')
-export const PMU_SCHEMA_SQL_PATH = path.join(process.cwd(), 'backend', 'db', 'schema.sql')
+const BACKEND_ROOT = path.resolve(__dirname, '..')
+
+export const PMU_DB_PATH = path.join(BACKEND_ROOT, 'data', 'pmu.db')
+export const PMU_SCHEMA_SQL_PATH = path.join(BACKEND_ROOT, 'db', 'schema.sql')
 
 function readSchemaSql(): string {
   return fs.readFileSync(PMU_SCHEMA_SQL_PATH, 'utf8')
 }
 
-const PMU_COURSE_CATALOG_PATH = path.join(process.cwd(), 'backend', 'db', 'pmu-course-catalog.json')
+const PMU_COURSE_CATALOG_PATH = path.join(BACKEND_ROOT, 'db', 'pmu-course-catalog.json')
 
 type CatalogCourse = {
   code: string
@@ -315,7 +317,7 @@ function seed(db: Database.Database) {
   }
 }
 
-const DEMO_ACADEMIC_SQL_PATH = path.join(process.cwd(), 'backend', 'db', 'demo-academic.sql')
+const DEMO_ACADEMIC_SQL_PATH = path.join(BACKEND_ROOT, 'db', 'demo-academic.sql')
 
 /** When DB has users/courses but no sections (e.g. JSON migrate only), load demo schedule. */
 function ensureAcademicSeed(db: Database.Database) {
@@ -329,7 +331,7 @@ let dbInstance: Database.Database | null = null
 export function getDb(): Database.Database {
   if (dbInstance) return dbInstance
   try {
-    const dir = path.join(process.cwd(), 'data')
+    const dir = path.join(BACKEND_ROOT, 'data')
     fs.mkdirSync(dir, { recursive: true })
     const db = new Database(PMU_DB_PATH)
     db.pragma('journal_mode = WAL')

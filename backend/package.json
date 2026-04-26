@@ -1,0 +1,26 @@
+{
+  "name": "pmu-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "db:migrate": "node scripts/migrate-json-to-sqlite.cjs",
+    "db:seed": "node scripts/seed-demo-users.cjs"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.9.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "jose": "^6.2.2",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "openai": "^6.34.0",
+    "tsx": "^4.21.0",
+    "uuid": "^13.0.0",
+    "xlsx": "^0.18.5"
+  }
+}

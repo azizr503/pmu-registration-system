@@ -13,8 +13,20 @@ import { profileRouter } from './routes/profile'
 import { settingsRouter } from './routes/settings'
 import { chatRouter } from './routes/chat'
 
-dotenv.config({ path: path.join(process.cwd(), '.env.local') })
-dotenv.config()
+const backendRoot = path.resolve(process.cwd())
+const workspaceRoot = path.resolve(
+  process.cwd(),
+  process.cwd().endsWith('backend') ? '..' : '.'
+)
+
+// Load env files deterministically for both run modes:
+// - npm --prefix backend run dev (cwd can be workspace root)
+// - running from backend directory directly
+dotenv.config({ path: path.join(workspaceRoot, '.env.local'), override: true })
+dotenv.config({ path: path.join(workspaceRoot, '.env'), override: true })
+dotenv.config({ path: path.join(backendRoot, '.env.local'), override: true })
+dotenv.config({ path: path.join(backendRoot, '.env'), override: true })
+dotenv.config({ override: true })
 
 getDb()
 
